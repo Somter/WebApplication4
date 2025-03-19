@@ -52,7 +52,7 @@ namespace WebApplication4.Controllers
 
                 if (_context.Users.Any(u => u.Username == model.Username))
                 {
-                    ViewBag.Error = "Користувач вже існує";
+                    ViewBag.Error = "Пользователь существут";
                     return View();
                 }
 
