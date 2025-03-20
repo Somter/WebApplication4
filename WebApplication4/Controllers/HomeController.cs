@@ -13,8 +13,18 @@ namespace WebApplication4.Controllers
         {
             _context = context;
         }
-        public IActionResult Index() => View();
+        public IActionResult Index()
+        {
+            int? userId = HttpContext.Session.GetInt32("UserId");
 
+            if (userId != null)
+            {
+                var user = _context.Users.FirstOrDefault(u => u.Id == userId);
+                return View(user); // ѕередаем пользовател€ в представление
+            }
+
+            return View(null); // ≈сли пользователь не найден, передаем null
+        }
         public IActionResult Privacy()
         {
             return View();

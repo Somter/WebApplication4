@@ -8,14 +8,23 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddControllersWithViews();
 
-//// Add session services
-//builder.Services.AddSession(options =>
-//{
-//    options.IdleTimeout = TimeSpan.FromMinutes(30); // Set session timeout
-//    options.Cookie.HttpOnly = true; // Secure cookie for the session
-//});
+builder.Services.AddDistributedMemoryCache(); // Это необходимо для работы сессий в памяти
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // Таймаут сессии
+    options.Cookie.HttpOnly = true; // Улучшенная безопасность
+    options.Cookie.IsEssential = true; // Делаем куки сессии необходимыми
+});
 
 var app = builder.Build();
+
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+
+app.UseRouting();
+app.UseAuthorization();
+
+app.UseSession();
 
 using (var scope = app.Services.CreateScope())
 {

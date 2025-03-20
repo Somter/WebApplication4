@@ -48,17 +48,25 @@ namespace WebApplication4.Controllers
             if (ModelState.IsValid)
             {
                 var user = _context.Users.FirstOrDefault(u => u.Username == model.Username && u.PasswordHash == model.PasswordHash);
-
                 if (user == null)
                 {
                     ViewBag.Error = "Неверный логин или пароль";
                     return View(model);
                 }
 
+                HttpContext.Session.SetInt32("UserId", user.Id); 
+
                 return RedirectToAction("Index", "Home");
             }
 
             return View(model);
         }
+
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear(); 
+            return RedirectToAction("Login", "Regist"); 
+        }
+
     }
 }
