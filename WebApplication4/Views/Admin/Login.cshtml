@@ -1,7 +1,7 @@
-﻿@model WebApplication4.Models.User
+﻿@model WebApplication4.Models.Admin
 
 @{
-    ViewData["Title"] = "Login";
+    ViewData["Title"] = "Login Admin";
 }
 
 <h2>Login</h2>
@@ -12,6 +12,8 @@
         @ViewBag.Error
     </div>
 }
+
+<h1>Вход в админ паенль</h1>
 
 <form method="post" asp-action="Login">
     <div class="form-group">
@@ -28,9 +30,3 @@
 
     <button type="submit" class="btn btn-primary">Login</button>
 </form>
-
-<p>
-    Don't have an account? <a href="/Auth/Register">Register here</a>
-</p>
-
-<p><a href="/Admin/Login">Войти как Админ</a></p>   

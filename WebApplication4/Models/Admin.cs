@@ -7,7 +7,7 @@ namespace WebApplication4.Models
         [Key]
         public int Id { get; set; }
 
-        [Required, StringLength(100)]
+        [Required]
         public string Username { get; set; }
 
         [Required]

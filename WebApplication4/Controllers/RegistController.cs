@@ -1,7 +1,6 @@
-﻿using WebApplication4.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Linq;
+using WebApplication4.Models;
 
 namespace WebApplication4.Controllers
 {
@@ -14,52 +13,49 @@ namespace WebApplication4.Controllers
             _context = context;
         }
 
-        public IActionResult Register() => View(); 
-        public IActionResult Login() => View(); 
+        public IActionResult Register() => View();
+        public IActionResult Login() => View();
 
         [HttpPost]
-        public IActionResult Login(User model)
+        public IActionResult Register(User model, string ConfirmPassword)
         {
             if (ModelState.IsValid)
             {
-                var user = _context.Users.FirstOrDefault(u => u.Username == model.Username);
-
-                if (user == null || user.PasswordHash != model.PasswordHash)
+                if (model.PasswordHash != ConfirmPassword)
                 {
-                    ViewBag.Error = "Неверный апроль или логин"; 
-                    return View(); 
-                }
-
-                //HttpContext.Session.SetString("UserId", user.Id.ToString());
-                //HttpContext.Session.SetString("Username", user.Username);
-
-                return RedirectToAction("Index", "Home");
-            }
-
-            return View(model);
-        }
-
-        [HttpPost]
-        public IActionResult Register(User model)
-        {
-            if (ModelState.IsValid)
-            {
-                if (model.PasswordHash != model.Email) 
-                {
-                    ViewBag.Error = "пароли не совпадают";
-                    return View();
+                    ViewBag.PasswordError = "Пароли не совпадают";
+                    return View(model);
                 }
 
                 if (_context.Users.Any(u => u.Username == model.Username))
                 {
-                    ViewBag.Error = "Пользователь существут";
-                    return View();
+                    ViewBag.Error = "Пользователь с таким именем уже существует";
+                    return View(model);
                 }
 
                 _context.Users.Add(model);
                 _context.SaveChanges();
 
                 return RedirectToAction("Login");
+            }
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public IActionResult Login(User model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = _context.Users.FirstOrDefault(u => u.Username == model.Username && u.PasswordHash == model.PasswordHash);
+
+                if (user == null)
+                {
+                    ViewBag.Error = "Неверный логин или пароль";
+                    return View(model);
+                }
+
+                return RedirectToAction("Index", "Home");
             }
 
             return View(model);

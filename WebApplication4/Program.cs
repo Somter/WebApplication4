@@ -24,6 +24,16 @@ using (var scope = app.Services.CreateScope())
     context.Database.EnsureCreated();
 }
 
+using (var scope = app.Services.CreateScope()) 
+{ 
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    if (!context.Admin.Any())
+    {
+        context.Admin.Add(new Admin { Username = "admin1", PasswordHash = "12345" });
+        context.SaveChanges();
+    }
+}
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
