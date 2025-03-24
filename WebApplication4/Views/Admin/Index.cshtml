@@ -6,18 +6,14 @@
 }
 <div class="header">
     <div class="logo">SashaMusic</div>
-    <nav class="nav-links">
-        <a href="@Url.Action("Index", "User")" class="btn btn-logout">Пользователи</a>
-        <a href="@Url.Action("Index", "Genre")" class="btn btn-logout">Жанры</a>
-        <a href="@Url.Action("Index", "Music")" class="btn btn-logout">Музыка</a>
-    </nav>
+    
     <div class="logout">
         <a href="@Url.Action("Logout", "Account")" class="btn btn-logout">Выйти</a>
     </div>
 </div>
   
 
-<table class="table">
+<table class="table" style="margin-top: 20px;">
     <thead>
         <tr>
             <th>ID</th>
@@ -74,3 +70,7 @@
         }
     </tbody>
 </table>
+<nav class="nav-links" style="margin-top: 30px;">   
+    <a href="@Url.Action("Index", "Genre")" class="btn btn-logout">Жанры</a>
+    <a href="@Url.Action("Index", "Music")" class="btn btn-logout">Музыка</a>
+</nav>
