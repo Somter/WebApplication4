@@ -1,0 +1,45 @@
+﻿@{
+    ViewBag.Title = "Song Page";
+}
+
+<h2>Добавить музыку</h2>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+@if (Context.Session.GetString("UserName") != null)
+{
+    <p><strong>Вы вошли как:</strong> @Context.Session.GetString("UserName")</p>
+}
+
+<form asp-action="Upload" asp-controller="Music" method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label for="Title" class="form-label">Название композиции:</label>  
+        <input type="text" name="Title" class="form-control" required />
+    </div>
+
+    <div class="mb-3">
+        <label for="File" class="form-label">Выберите файл:</label>
+        <input type="file" name="File" class="form-control" required />
+    </div>
+
+    <div class="mb-3">
+        <label for="GenreId" class="form-label">Выберите жанр:</label>
+        <select name="GenreId" class="form-control" required>
+            <option value="">Выберите жанр...</option>
+            @foreach (var genre in ViewBag.Genres)
+            {
+                <option value="@genre.Id">@genre.Name</option>
+            }
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Загрузить</button>
+</form>

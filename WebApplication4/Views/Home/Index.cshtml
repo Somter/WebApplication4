@@ -4,27 +4,56 @@
     ViewData["Title"] = "Home Page";
 }
 
-<a asp-action="Register" asp-controller="Regist" class="btn btn-secondary">Перейти к регистрации</a>
-<a asp-action="Login" asp-controller="Regist" class="btn btn-secondary">Вход</a>
+<header style="background-color: #1a1a1a; padding: 15px; width: 100%; box-sizing: border-box;">
+    <nav style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto;">
+        <h1 style="color: orange; margin: 0;">SashaMusic</h1>
+        <div>
+            @if (Model != null && Model.IsActive)
+            {
+                <a asp-action="Upload" asp-controller="Music"
+                   style="background-color: #ff8c00; color: black; padding: 10px 15px; text-decoration: none; border-radius: 5px; margin-right: 10px;">
+                    Добавить музыку
+                </a>
+                <a asp-action="Logout" asp-controller="Regist"
+                   style="background-color: #ff8c00; color: black; padding: 10px 15px; text-decoration: none; border-radius: 5px;">
+                    Выход
+                </a>
+            }
+            else
+            {
+                <a asp-action="Register" asp-controller="Regist"
+                   style="background-color: #ff8c00; color: black; padding: 10px 15px; text-decoration: none; border-radius: 5px; margin-right: 10px;">
+                    Регистрация
+                </a>
+                <a asp-action="Login" asp-controller="Regist"
+                   style="background-color: #ff8c00; color: black; padding: 10px 15px; text-decoration: none; border-radius: 5px;">
+                    Вход
+                </a>
+            }
+        </div>
+    </nav>
+</header>
+<div class="container">
+    <h2>Список песен</h2>
 
-@if (Model != null)
-{
-    @if (Model.IsActive)
+    @if (ViewBag.Songs != null && ((List<WebApplication4.Models.Song>)ViewBag.Songs).Any())
     {
-        <p class="text-success">Вы активированы!</p>
-        <a asp-action="Upload" asp-controller="Music" class="btn btn-primary">Добавить музыку</a>
-
+        <ul>
+            @foreach (var song in (List<WebApplication4.Models.Song>)ViewBag.Songs)
+            {
+                <li>
+                    <strong>@song.Title</strong> - @song.Genre?.Name
+                    <br />
+                    <audio controls>
+                        <source src="@Url.Content(song.FilePath)" type="audio/mpeg" />
+                        Ваш браузер не поддерживает элемент audio.
+                    </audio>
+                </li>
+            }
+        </ul>
     }
     else
     {
-        <p class="text-danger">Дождитесь, пока администратор вас добавит.</p>
+        <p>Нет доступных песен.</p>
     }
-
-    <form asp-action="Logout" asp-controller="Regist" method="post" style="display:inline;">
-        <button type="submit" class="btn btn-danger">Выход</button>
-    </form>
-}
-else
-{
-    <p class="text-warning">Вы не вошли в систему.</p>
-}
+</div>

@@ -8,12 +8,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddDistributedMemoryCache(); // Это необходимо для работы сессий в памяти
+builder.Services.AddDistributedMemoryCache(); 
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(30); // Таймаут сессии
-    options.Cookie.HttpOnly = true; // Улучшенная безопасность
-    options.Cookie.IsEssential = true; // Делаем куки сессии необходимыми
+    options.IdleTimeout = TimeSpan.FromMinutes(30); 
+    options.Cookie.HttpOnly = true; 
+    options.Cookie.IsEssential = true; 
 });
 
 var app = builder.Build();
@@ -39,6 +39,16 @@ using (var scope = app.Services.CreateScope())
     if (!context.Admin.Any())
     {
         context.Admin.Add(new Admin { Username = "admin1", PasswordHash = "12345" });
+        context.SaveChanges();
+    }
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    if (!context.Genre.Any())
+    {
+        context.Genre.Add(new Genre { Name = "Рок"});
         context.SaveChanges();
     }
 }

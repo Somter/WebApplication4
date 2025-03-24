@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using WebApplication4.Models;
 using System.Linq;
 using System.Diagnostics;
+using Microsoft.EntityFrameworkCore;
 
 namespace WebApplication4.Controllers
 {
@@ -13,18 +14,23 @@ namespace WebApplication4.Controllers
         {
             _context = context;
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             int? userId = HttpContext.Session.GetInt32("UserId");
 
+            // Загружаем все песни с их жанрами
+            var songs = await _context.Songs.Include(s => s.Genre).ToListAsync();
+            ViewBag.Songs = songs;
+
             if (userId != null)
             {
-                var user = _context.Users.FirstOrDefault(u => u.Id == userId);
-                return View(user); // Передаем пользователя в представление
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+                return View(user);
             }
 
-            return View(null); // Если пользователь не найден, передаем null
+            return View(null);
         }
+
         public IActionResult Privacy()
         {
             return View();
