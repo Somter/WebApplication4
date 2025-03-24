@@ -1,10 +1,18 @@
 ﻿@model List<WebApplication4.Models.User>
 
 @{
-    ViewData["Title"] = "Admin - Users";
+    ViewData["Title"] = "Admin Panel";
+    Layout = "_Layout";
 }
 
+<div class="header">
+    <div class="logo">SashaMusic</div>
+    <div class="logout">
+        <a href="@Url.Action("Logout", "Account")" class="btn btn-logout">Выйти</a>
+    </div>
+</div>   
 
+ 
 <table class="table">
     <thead>
         <tr>
@@ -13,6 +21,8 @@
             <th>Email</th>
             <th>Статус</th>
             <th>Действие</th>
+            <th>Редактировать</th>
+            <th>Удалить</th>
         </tr>
     </thead>
     <tbody>
@@ -36,14 +46,25 @@
                     @if (!user.IsActive)
                     {
                         <a asp-action="ActivateUser" asp-controller="Admin" asp-route-id="@user.Id"
-                           style="background-color: #ff8c00; color: black; padding: 10px 15px; text-decoration: none; border-radius: 5px; margin-right: 10px;">
+                           class="btn btn-warning">
                             Добавить
                         </a>
                     }
                     else
                     {
-                        <button class="btn-secondary" disabled>Уже активен</button>
+                        <button class="btn-secondary" style="width: 100%" disabled>Активен</button>
                     }
+                </td>
+                <td>
+                    <a asp-action="EditUser" asp-controller="Admin" asp-route-id="@user.Id"
+                       class="btn-link">
+                        &#9998;
+                    </a>
+                </td>
+                <td>  
+                    <a asp-action="DeleteUser" asp-controller="Admin" asp-route-id="@user.Id" method="post" class="btn-link"> 
+                        🗑
+                    </a>
                 </td>
             </tr>
         }

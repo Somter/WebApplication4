@@ -38,17 +38,67 @@ namespace WebApplication4.Controllers
             return View(model); 
         }
 
-        public IActionResult ActivateUser(int Id) 
+        public IActionResult ActivateUser(int Id)
         {
             var user = _context.Users.FirstOrDefault(u => u.Id == Id);
 
-            if (user != null) 
-            { 
+            if (user != null)
+            {
                 user.IsActive = true;
                 _context.SaveChanges();
             }
 
             return RedirectToAction("Index");
         }
+
+        public IActionResult DeleteUser(int Id)
+        {
+            var user = _context.Users.FirstOrDefault(u => u.Id == Id);
+            if (user != null) 
+            {
+                var songs = _context.Songs.Where(x => x.UserId == user.Id).ToList();
+
+                foreach (var item in songs)
+                {
+                    item.UserId = null;
+                }
+
+                _context.Users.Remove(user);
+                _context.SaveChanges();
+            }
+            return RedirectToAction("Index");
+        }
+        [HttpGet]
+        public IActionResult EditUser(int Id)
+        {
+            var user = _context.Users.FirstOrDefault(u => u.Id == Id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return View(user); 
+        }
+
+        [HttpPost]
+        public IActionResult EditUser(User model) 
+        {
+            var user = _context.Users.FirstOrDefault(u => u.Id == model.Id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            user.Username = model.Username;
+            user.Email = model.Email;
+            user.IsActive = model.IsActive;
+
+            _context.SaveChanges();
+
+            return RedirectToAction("Index");   
+        }
+
     }
 }

@@ -11,12 +11,14 @@ body {
     background-color: #1e1e1e;
     border-radius: 10px;
     overflow: hidden;
+    margin: auto; 
 }
 
     .table th, .table td {
         padding: 12px;
         border-bottom: 1px solid #333;
-        text-align: left;
+        text-align: center;
+        vertical-align: middle;
     }
 
     .table th {
@@ -61,6 +63,44 @@ body {
 .text-danger {
     color: #ff4444 !important;
 }
+/* ќбщий стиль дл€ хедера */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #1e1e1e;
+    color: #fff;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+.logo {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.logout {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-logout {
+    background-color: #ff4444;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+    .btn-logout:hover {
+        background-color: #cc0000;
+    }
+
 
 /*Home css:*/
 
@@ -328,7 +368,7 @@ h2 {
 }
 
 .btn-add-music {
-    background-color: #ff8c00; /* ÷вет кнопки как у кнопок регистрации */
+    background-color: #ff8c00; 
     border: none;
     color: #121212;
     padding: 10px 15px;
@@ -336,7 +376,20 @@ h2 {
     border-radius: 5px;
     font-weight: bold;
     transition: 0.3s;
-    width: 100%; /* —делаем кнопку во всю ширину, как в регистрации */
+    width: 100%; 
     font-size: 16px;
-  
 }
+
+.btn-link {
+    background-color: #ff8c00;
+    color: black;   
+    padding: 10px 15px; 
+    text-decoration: none;  
+    border-radius: 5px; 
+}
+
+    .btn-link:hover {
+        color: black !important; 
+        background-color: #e07b00; 
+        text-decoration: none; 
+    }
