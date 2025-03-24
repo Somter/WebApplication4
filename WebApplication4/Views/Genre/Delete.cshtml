@@ -1,0 +1,56 @@
+﻿@model WebApplication4.Models.Genre
+
+@{
+    ViewData["Title"] = "Подтвердите удаление жанра";
+}
+
+<div class="confirm-delete-container">
+    <h2>Удалить жанр <strong>@Model.Name</strong>?</h2>
+
+    <form method="post" asp-action="DeleteConfirmed" asp-route-id="@Model.Id">
+        <button type="submit" class="btn btn-danger">Удалить</button>
+        <a href="@Url.Action("Index", "Genre")" class="btn btn-secondary">Отменить</a>
+    </form>
+</div>
+
+<style>
+    .confirm-delete-container {
+        max-width: 800px;
+        margin: 50px auto;
+        padding: 20px;
+        text-align: center;
+    }
+
+    h2 {
+        color: #e74c3c;
+    }
+
+    .btn {
+        padding: 12px 25px; 
+        border-radius: 5px;
+        font-size: 16px;
+        text-decoration: none;
+        margin: 10px;
+        display: inline-block;
+        width: 200px; 
+        text-align: center; 
+    }
+
+    .btn-danger {
+        background-color: #e74c3c;
+        color: white;
+    }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+    .btn-secondary {
+        background-color: #ccc;
+        color: black;
+    }
+
+        .btn-secondary:hover {
+            background-color: #999;
+        }
+</style>

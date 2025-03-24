@@ -13,20 +13,67 @@ namespace WebApplication4.Controllers
 
         public IActionResult Index()
         {
-            var ganre = _context.Genre.ToList();
-            return View(ganre); 
+            var genre = _context.Genre.ToList();
+            return View(genre);
         }
 
-        public IActionResult Create() 
+        public IActionResult Create()
         {
             return View();
+        }
+
+        public IActionResult Edit()
+        {
+            return View();
+        }
+
+        public IActionResult Delete(int id)
+        {
+            var genre = _context.Genre.FirstOrDefault(g => g.Id == id);
+
+            if (genre == null)
+            {
+                return NotFound();
+            }
+
+            return View(genre);  
+        }
+
+        [HttpPost]
+        public IActionResult DeleteConfirmed(int id)
+        {
+            var genre = _context.Genre.FirstOrDefault(g => g.Id == id);
+
+            if (genre != null)
+            {
+                _context.Genre.Remove(genre);
+                _context.SaveChanges();
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public IActionResult Edit(Genre model)
+        {
+            var genre = _context.Genre.FirstOrDefault(g => g.Id == model.Id);
+
+            if (genre == null)
+            {
+                return NotFound();
+            }
+
+            genre.Name = model.Name;
+            _context.SaveChanges();
+
+            return RedirectToAction("Index");
         }
 
         [HttpPost]
         public IActionResult Create(Genre model)
         {
-            if (_context.Genre.Any(g => g.Name == model.Name)) 
-            { 
+            if (_context.Genre.Any(g => g.Name == model.Name))
+            {
                 ViewBag.Error = "Такой жанр уже существует";
                 return View(model);
             }
@@ -34,7 +81,7 @@ namespace WebApplication4.Controllers
             _context.Genre.Add(model);
             _context.SaveChanges();
 
-            return RedirectToAction("Index");   
+            return RedirectToAction("Index");
         }
     }
 }

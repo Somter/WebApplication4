@@ -1,0 +1,26 @@
+﻿@model WebApplication4.Models.Genre
+
+@{
+    ViewData["Title"] = "Редактировать жандр";
+}
+
+<h2>Редактировать жанр</h2>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">
+        @ViewBag.Error
+    </div>
+}
+
+<div class="register-container">
+    <form method="post" asp-action="Edit">
+        <div class="form-group">
+            <label asp-for="Name" class="control-label">Название</label>
+            <input asp-for="Name" class="form-control" required />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Создать</button>
+    </form>
+</div>
