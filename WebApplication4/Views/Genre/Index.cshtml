@@ -1,0 +1,130 @@
+﻿@model List<WebApplication4.Models.Genre>
+
+@{
+    ViewData["Title"] = "Жанры";
+    Layout = "_Layout";
+}
+
+<div class="header">
+    <div class="logo">SashaMusic</div>
+    <div class="top-bar-actions">
+        <a href="@Url.Action("Index", "Admin")" class="top-bar-btn">Назад</a>
+    </div>
+</div>
+
+<div class="container">
+    <h2 class="page-title">Музыкальные жанры</h2>
+
+    <div class="genre-container">
+        @foreach (var genre in Model)
+        {
+            <div class="genre-card">
+                <h3>@genre.Name</h3>
+                <div class="btn-group">
+                    <a href="@Url.Action("Edit", "Genre", new { id = genre.Id })" class="btn btn-edit">✏️</a>
+                    <a href="@Url.Action("Delete", "Genre", new { id = genre.Id })" class="btn btn-delete" onclick="return confirm('Вы уверены, что хотите удалить жанр?');">🗑</a>
+                </div>
+            </div>
+        }
+
+    </div>
+    <div class="top-bar-actions">
+        <a href="@Url.Action("Create", "Genre")" class="top-bar-btn">Добавить</a>
+    </div>
+</div>
+
+<style>
+    .container {
+        max-width: 1200px;
+        margin: auto;
+        padding: 20px;
+        text-align: center;
+        margin-top: 30px;
+    }
+
+    .top-bar-btn {
+        background-color: #ff8c00;
+        border: none;
+        color: #121212;
+        padding: 10px 15px;
+        text-decoration: none;
+        border-radius: 5px;
+        font-weight: bold;
+        transition: 0.3s;
+        margin: 0; 
+    }
+
+        .top-bar-btn:hover {
+            background-color: #e07b00;
+            color: #121212 !important;
+        }
+
+    .page-title {
+        font-size: 28px;
+        margin-bottom: 20px;
+        color: #ffff;
+    }
+
+    .genre-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+        margin-bottom: 20px;    
+    }
+
+    .genre-card {
+        background: #222;
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        width: 320px; /* Увеличил ширину карточки */
+        text-align: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s;
+    }
+
+        .genre-card h3 {
+            margin-bottom: 10px;
+        }
+
+    .btn-group {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+        margin-top: 10px;
+    }
+
+    .btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px; 
+        height: 40px; 
+        font-size: 18px;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: 0.3s;
+    }
+
+    .btn-edit {
+        background: #3498db;
+    }
+
+        .btn-edit:hover {
+            background: #2980b9;
+        }
+
+    .btn-delete {
+        background: #e74c3c;
+    }
+
+        .btn-delete:hover {
+            background: #c0392b;
+        }
+
+    .genre-card:hover {
+        transform: scale(1.05);
+    }
+</style>

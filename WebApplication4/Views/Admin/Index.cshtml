@@ -4,15 +4,19 @@
     ViewData["Title"] = "Admin Panel";
     Layout = "_Layout";
 }
-
 <div class="header">
     <div class="logo">SashaMusic</div>
+    <nav class="nav-links">
+        <a href="@Url.Action("Index", "User")" class="btn btn-logout">Пользователи</a>
+        <a href="@Url.Action("Index", "Genre")" class="btn btn-logout">Жанры</a>
+        <a href="@Url.Action("Index", "Music")" class="btn btn-logout">Музыка</a>
+    </nav>
     <div class="logout">
         <a href="@Url.Action("Logout", "Account")" class="btn btn-logout">Выйти</a>
     </div>
-</div>   
+</div>
+  
 
- 
 <table class="table">
     <thead>
         <tr>
@@ -57,12 +61,12 @@
                 </td>
                 <td>
                     <a asp-action="EditUser" asp-controller="Admin" asp-route-id="@user.Id"
-                       class="btn-link">
-                        &#9998;
+                       class="btn-edit">
+                        ✏️
                     </a>
                 </td>
                 <td>  
-                    <a asp-action="DeleteUser" asp-controller="Admin" asp-route-id="@user.Id" method="post" class="btn-link"> 
+                    <a asp-action="DeleteUser" asp-controller="Admin" asp-route-id="@user.Id" method="post" class="btn-delete"> 
                         🗑
                     </a>
                 </td>

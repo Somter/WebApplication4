@@ -380,15 +380,23 @@ h2 {
     font-size: 16px;
 }
 
-.btn-link {
-    background-color: #ff8c00;
-    color: black;   
-    padding: 10px 15px; 
-    text-decoration: none;  
-    border-radius: 5px; 
+.btn-delete {
+    background-color: #e74c3c;
+    color: black;
+    padding: 10px 15px;
+    text-decoration: none;
+    border-radius: 5px;
 }
 
-    .btn-link:hover {
+.btn-edit {
+    background-color: #3498db;
+    color: black;
+    padding: 10px 15px;
+    text-decoration: none;
+    border-radius: 5px;
+}
+    .btn-delte:hover,
+    .btn-edit:hover {
         color: black !important; 
         background-color: #e07b00; 
         text-decoration: none; 
