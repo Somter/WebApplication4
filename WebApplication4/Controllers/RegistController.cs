@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using WebApplication4.Models;
+using WebApplication4.ViewModels;
+
 
 namespace WebApplication4.Controllers
 {
@@ -13,34 +15,37 @@ namespace WebApplication4.Controllers
             _context = context;
         }
 
-        public IActionResult Register() => View();
+        public IActionResult Register() => View(new RegisterViewModel());
         public IActionResult Login() => View();
 
         [HttpPost]
-        public IActionResult Register(User model, string ConfirmPassword)
+        public IActionResult Register(RegisterViewModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                if (model.PasswordHash != ConfirmPassword)
-                {
-                    ViewBag.PasswordError = "Пароли не совпадают";
-                    return View(model);
-                }
-
-                if (_context.Users.Any(u => u.Username == model.Username))
-                {
-                    ViewBag.Error = "Пользователь с таким именем уже существует";
-                    return View(model);
-                }
-
-                _context.Users.Add(model);
-                _context.SaveChanges();
-
-                return RedirectToAction("Login");
+                return View(model); // Ошибки автоматически отобразятся валидацией
             }
 
-            return View(model);
+            if (_context.Users.Any(u => u.Username == model.Username))
+            {
+                ModelState.AddModelError("Username", "Пользователь с таким именем уже существует");
+                return View(model);
+            }
+
+            var newUser = new User
+            {
+                Username = model.Username,
+                PasswordHash = model.Password, 
+                Email = model.Email
+            };
+
+            _context.Users.Add(newUser);
+            _context.SaveChanges();
+
+            return RedirectToAction("Login");
         }
+
+
 
         [HttpPost]
         public IActionResult Login(User model)
