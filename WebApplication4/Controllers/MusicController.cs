@@ -18,79 +18,103 @@ namespace WebApplication4.Controllers
         [HttpGet]
         public IActionResult Upload()
         {
-
-            ViewBag.Genres = _context.Genre.ToList();
-            return View();
+            try
+            {
+                ViewBag.Genres = _context.Genre.ToList();
+                return View();
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Ошибка при загрузке страницы загрузки.";
+                Console.WriteLine($"Ошибка при отображении страницы Upload: {ex.Message}");
+                return RedirectToAction("Index", "Home");
+            }
         }
 
         [HttpPost]
         public async Task<IActionResult> Upload(string Title, int GenreId, IFormFile File)
         {
-            if (File == null || File.Length == 0)
+            try
             {
-                TempData["ErrorMessage"] = "Пожалуйста, загрузите файл.";
+                if (File == null || File.Length == 0)
+                {
+                    TempData["ErrorMessage"] = "Пожалуйста, загрузите файл.";
+                    return RedirectToAction("Upload");
+                }
+
+                var userId = HttpContext.Session.GetInt32("UserId");
+                if (userId == null)
+                {
+                    return RedirectToAction("Login", "Regist");
+                }
+
+                var user = _context.Users.FirstOrDefault(u => u.Id == userId);
+                if (user == null)
+                {
+                    return RedirectToAction("Login", "Regist");
+                }
+
+                var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                var fileName = Path.GetFileName(File.FileName);
+                var filePath = Path.Combine(uploadsFolder, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await File.CopyToAsync(stream);
+                }
+
+                var newSong = new Song
+                {
+                    Title = Title,
+                    GenreId = GenreId,
+                    FilePath = "/uploads/" + fileName,
+                    UserId = user.Id
+                };
+
+                _context.Songs.Add(newSong);
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "Песня успешно загружена!";
                 return RedirectToAction("Upload");
             }
-
-            var userId = HttpContext.Session.GetInt32("UserId");
-            if (userId == null)
+            catch (Exception ex)
             {
-                return RedirectToAction("Login", "Regist");
+                TempData["ErrorMessage"] = "Ошибка при загрузке песни. Попробуйте снова.";
+                Console.WriteLine($"Ошибка загрузки песни: {ex.Message}");
+                return RedirectToAction("Upload");
             }
-
-            var user = _context.Users.FirstOrDefault(u => u.Id == userId);
-            if (user == null)
-            {
-                return RedirectToAction("Login", "Regist");
-            }
-
-            var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
-            if (!Directory.Exists(uploadsFolder))
-            {
-                Directory.CreateDirectory(uploadsFolder);
-            }
-
-            var fileName = Path.GetFileName(File.FileName);
-            var filePath = Path.Combine(uploadsFolder, fileName);
-
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await File.CopyToAsync(stream);
-            }
-
-            var newSong = new Song
-            {
-                Title = Title,
-                GenreId = GenreId,
-                FilePath = "/uploads/" + fileName,
-                UserId = user.Id
-            };
-
-            _context.Songs.Add(newSong);
-            await _context.SaveChangesAsync();
-
-            TempData["SuccessMessage"] = "Песня успешно загружена!";
-            return RedirectToAction("Upload");
         }
-
 
         public IActionResult Download(string fileName)
         {
-            if (string.IsNullOrEmpty(fileName))
+            try
             {
-                return NotFound("Файл не найден.");
+                if (string.IsNullOrEmpty(fileName))
+                {
+                    return NotFound("Файл не найден.");
+                }
+
+                var uploadsPath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
+                var fullPath = Path.Combine(uploadsPath, fileName);
+
+                if (!System.IO.File.Exists(fullPath))
+                {
+                    return NotFound("Файл не найден.");
+                }
+
+                var fileBytes = System.IO.File.ReadAllBytes(fullPath);
+                return File(fileBytes, "audio/mpeg", fileName);
             }
-
-            var uploadsPath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
-            var fullPath = Path.Combine(uploadsPath, fileName);
-
-            if (!System.IO.File.Exists(fullPath))
+            catch (Exception ex)
             {
-                return NotFound("Файл не найден.");
+                Console.WriteLine($"Ошибка при скачивании файла {fileName}: {ex.Message}");
+                return NotFound("Ошибка при скачивании файла.");
             }
-
-            var fileBytes = System.IO.File.ReadAllBytes(fullPath);
-            return File(fileBytes, "audio/mpeg", fileName);
         }
     }
 }

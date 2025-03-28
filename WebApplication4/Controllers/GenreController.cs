@@ -6,6 +6,7 @@ namespace WebApplication4.Controllers
     public class GenreController : Controller
     {
         private readonly ApplicationDbContext _context;
+
         public GenreController(ApplicationDbContext context)
         {
             _context = context;
@@ -13,8 +14,17 @@ namespace WebApplication4.Controllers
 
         public IActionResult Index()
         {
-            var genre = _context.Genre.ToList();
-            return View(genre);
+            try
+            {
+                var genres = _context.Genre.ToList();
+                return View(genres);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при загрузке жанров: {ex.Message}");
+                TempData["ErrorMessage"] = "Ошибка при загрузке списка жанров.";
+                return RedirectToAction("Index");
+            }
         }
 
         public IActionResult Create()
@@ -22,66 +32,114 @@ namespace WebApplication4.Controllers
             return View();
         }
 
-        public IActionResult Edit()
+        public IActionResult Edit(int id)
         {
-            return View();
+            try
+            {
+                var genre = _context.Genre.FirstOrDefault(g => g.Id == id);
+                if (genre == null)
+                {
+                    return NotFound();
+                }
+
+                return View(genre);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при редактировании жанра: {ex.Message}");
+                TempData["ErrorMessage"] = "Ошибка при загрузке страницы редактирования.";
+                return RedirectToAction("Index");
+            }
         }
 
         public IActionResult Delete(int id)
         {
-            var genre = _context.Genre.FirstOrDefault(g => g.Id == id);
-
-            if (genre == null)
+            try
             {
-                return NotFound();
-            }
+                var genre = _context.Genre.FirstOrDefault(g => g.Id == id);
+                if (genre == null)
+                {
+                    return NotFound();
+                }
 
-            return View(genre);  
+                return View(genre);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при загрузке страницы удаления: {ex.Message}");
+                TempData["ErrorMessage"] = "Ошибка при загрузке страницы удаления.";
+                return RedirectToAction("Index");
+            }
         }
 
         [HttpPost]
         public IActionResult DeleteConfirmed(int id)
         {
-            var genre = _context.Genre.FirstOrDefault(g => g.Id == id);
-
-            if (genre != null)
+            try
             {
-                _context.Genre.Remove(genre);
-                _context.SaveChanges();
-            }
+                var genre = _context.Genre.FirstOrDefault(g => g.Id == id);
+                if (genre != null)
+                {
+                    _context.Genre.Remove(genre);
+                    _context.SaveChanges();
+                }
 
-            return RedirectToAction("Index");
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при удалении жанра: {ex.Message}");
+                TempData["ErrorMessage"] = "Ошибка при удалении жанра.";
+                return RedirectToAction("Index");
+            }
         }
 
         [HttpPost]
         public IActionResult Edit(Genre model)
         {
-            var genre = _context.Genre.FirstOrDefault(g => g.Id == model.Id);
-
-            if (genre == null)
+            try
             {
-                return NotFound();
+                var genre = _context.Genre.FirstOrDefault(g => g.Id == model.Id);
+                if (genre == null)
+                {
+                    return NotFound();
+                }
+
+                genre.Name = model.Name;
+                _context.SaveChanges();
+
+                return RedirectToAction("Index");
             }
-
-            genre.Name = model.Name;
-            _context.SaveChanges();
-
-            return RedirectToAction("Index");
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при редактировании жанра: {ex.Message}");
+                TempData["ErrorMessage"] = "Ошибка при редактировании жанра.";
+                return RedirectToAction("Index");
+            }
         }
 
         [HttpPost]
         public IActionResult Create(Genre model)
         {
-            if (_context.Genre.Any(g => g.Name == model.Name))
+            try
             {
-                ViewBag.Error = "Такой жанр уже существует";
-                return View(model);
+                if (_context.Genre.Any(g => g.Name == model.Name))
+                {
+                    ViewBag.Error = "Такой жанр уже существует";
+                    return View(model);
+                }
+
+                _context.Genre.Add(model);
+                _context.SaveChanges();
+
+                return RedirectToAction("Index");
             }
-
-            _context.Genre.Add(model);
-            _context.SaveChanges();
-
-            return RedirectToAction("Index");
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при создании жанра: {ex.Message}");
+                TempData["ErrorMessage"] = "Ошибка при добавлении жанра.";
+                return RedirectToAction("Create");
+            }
         }
     }
 }
