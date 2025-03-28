@@ -16,14 +16,14 @@ namespace WebApplication4.Controllers
         }
 
         public IActionResult Register() => View(new RegisterViewModel());
-        public IActionResult Login() => View();
+        public IActionResult Login() => View(new LoginViewModel());
 
         [HttpPost]
         public IActionResult Register(RegisterViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                return View(model); // Ошибки автоматически отобразятся валидацией
+                return View(model);
             }
 
             if (_context.Users.Any(u => u.Username == model.Username))
@@ -48,30 +48,29 @@ namespace WebApplication4.Controllers
 
 
         [HttpPost]
-        public IActionResult Login(User model)
+        public IActionResult Login(LoginViewModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var user = _context.Users.FirstOrDefault(u => u.Username == model.Username && u.PasswordHash == model.PasswordHash);
-                if (user == null)
-                {
-                    ViewBag.Error = "Неверный логин или пароль";
-                    return View(model);
-                }
-
-                HttpContext.Session.SetInt32("UserId", user.Id); 
-
-                return RedirectToAction("Index", "Home");
+                return View(model);
             }
 
-            return View(model);
+            var user = _context.Users.FirstOrDefault(u => u.Username == model.Username && u.PasswordHash == model.Password);
+            if (user == null)
+            {
+                ModelState.AddModelError(string.Empty, "Неверный логин или пароль");
+                return View(model);
+            }
+
+            HttpContext.Session.SetInt32("UserId", user.Id);
+
+            return RedirectToAction("Index", "Home");
         }
 
         public IActionResult Logout()
         {
-            HttpContext.Session.Clear(); 
-            return RedirectToAction("Login", "Regist"); 
+            HttpContext.Session.Clear();
+            return RedirectToAction("Login", "Regist");
         }
-
     }
 }

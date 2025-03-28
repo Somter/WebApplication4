@@ -17,6 +17,6 @@ namespace WebApplication4.ViewModels
         [Required(ErrorMessage = "Введите email")]
         [EmailAddress(ErrorMessage = "Некорректный формат email")]
         public string Email { get; set; }
-        public string? ErrorMessage { get; set; } // Это не должно быть [Required]
+        public string? ErrorMessage { get; set; } 
     }
 }
