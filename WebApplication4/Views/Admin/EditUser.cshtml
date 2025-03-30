@@ -1,4 +1,4 @@
-﻿@model WebApplication4.Models.User
+﻿@model WebApplication4.ViewModels.EditUserViewModel
 
 @{
     ViewData["Title"] = "Редактирование пользователя";
@@ -7,15 +7,15 @@
 <div class="register-container">
     <h2>Редактировать</h2>
 
-    @if (ViewBag.Error != null)
+    @if (TempData["ErrorMessage"] != null)
     {
         <div class="alert alert-danger">
-            @ViewBag.Error
+            @TempData["ErrorMessage"]
         </div>
     }
 
     <form method="post" asp-action="EditUser">
-        <input type="hidden" asp-for="Id" /> 
+        <input type="hidden" asp-for="Id" />
 
         <div class="form-group">
             <label asp-for="Username" class="control-label">Логин</label>

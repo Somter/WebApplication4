@@ -6,9 +6,12 @@
 
 <h2>Регистрация</h2>
 
-<div asp-validation-summary="All" class="alert alert-danger"></div>
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
 
-<form method="post" asp-action="Register">
+<form method="post" asp-action="Register" id="registerForm">
     <div class="form-group">
         <label asp-for="Username" class="control-label">Логин</label>
         <input asp-for="Username" class="form-control" />
@@ -41,3 +44,4 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }
+

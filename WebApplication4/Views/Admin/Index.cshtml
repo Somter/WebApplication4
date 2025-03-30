@@ -45,8 +45,7 @@
                 <td>
                     @if (!user.IsActive)
                     {
-                        <a asp-action="ActivateUser" asp-controller="Admin" asp-route-id="@user.Id"
-                           class="btn btn-warning">
+                        <a asp-action="ActivateUser" asp-controller="Admin" asp-route-id="@user.Id" class="btn btn-warning">
                             Добавить
                         </a>
                     }
@@ -55,16 +54,20 @@
                         <button class="btn-secondary" style="width: 100%" disabled>Активен</button>
                     }
                 </td>
+
                 <td>
                     <a asp-action="EditUser" asp-controller="Admin" asp-route-id="@user.Id"
                        class="btn-edit">
                         ✏️
                     </a>
                 </td>
-                <td>  
-                    <a asp-action="DeleteUser" asp-controller="Admin" asp-route-id="@user.Id" method="post" class="btn-delete"> 
+                <td>
+                    <a href="#" class="btn-delete" onclick="event.preventDefault(); document.getElementById('delete-form-@user.Id').submit();">
                         🗑
                     </a>
+                    <form id="delete-form-@user.Id" asp-action="DeleteUser" asp-controller="Admin" asp-route-id="@user.Id" method="post" style="display:none;">
+                       
+                    </form>
                 </td>
             </tr>
         }

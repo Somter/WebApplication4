@@ -4,6 +4,7 @@ using System.Linq;
 using WebApplication4.Models;
 using WebApplication4.ViewModels;
 using Microsoft.AspNetCore.Http;
+using System.Text.RegularExpressions;
 
 namespace WebApplication4.Controllers
 {
@@ -22,38 +23,38 @@ namespace WebApplication4.Controllers
         [HttpPost]
         public IActionResult Register(RegisterViewModel model)
         {
-            try
+            if (!ModelState.IsValid)
             {
-                if (!ModelState.IsValid)
-                {
-                    return View(model);
-                }
-
-                if (_context.Users.Any(u => u.Username == model.Username))
-                {
-                    ModelState.AddModelError("Username", "Пользователь с таким именем уже существует");
-                    return View(model);
-                }
-
-                var newUser = new User
-                {
-                    Username = model.Username,
-                    PasswordHash = model.Password, // ВАЖНО: нужно хешировать пароль
-                    Email = model.Email
-                };
-
-                _context.Users.Add(newUser);
-                _context.SaveChanges();
-
-                return RedirectToAction("Login");
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError(string.Empty, "Произошла ошибка при регистрации. Попробуйте еще раз.");
-                Console.WriteLine($"Ошибка регистрации: {ex.Message}");
                 return View(model);
             }
+
+            if (_context.Users.Any(u => u.Username == model.Username))
+            {
+                ModelState.AddModelError("Username", "Пользователь с таким именем уже существует");
+                return View(model);
+            }
+
+            var passwordRegex = new Regex(@"^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{6,}$");
+            if (!passwordRegex.IsMatch(model.Password))
+            {
+                ModelState.AddModelError("Password", "Пароль должен содержать хотя бы одну заглавную букву, цифру и специальный символ.");
+                return View(model);
+            }
+
+            var newUser = new User
+            {
+                Username = model.Username,
+                PasswordHash = model.Password,
+                Email = model.Email
+            };
+
+            _context.Users.Add(newUser);
+            _context.SaveChanges();
+
+            TempData["SuccessMessage"] = "Вы успешно зарегистрированы!";
+            return RedirectToAction("Login");
         }
+
 
         [HttpPost]
         public IActionResult Login(LoginViewModel model)

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using WebApplication4.Models;
+using WebApplication4.ViewModels;
 
 namespace WebApplication4.Controllers
 {
@@ -20,8 +21,12 @@ namespace WebApplication4.Controllers
         {
             try
             {
-                ViewBag.Genres = _context.Genre.ToList();
-                return View();
+                var model = new MusicUploadViewModel
+                {
+                    Genres = _context.Genre.ToList()
+                };
+
+                return View(model);
             }
             catch (Exception ex)
             {
@@ -32,11 +37,11 @@ namespace WebApplication4.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Upload(string Title, int GenreId, IFormFile File)
+        public async Task<IActionResult> Upload(MusicUploadViewModel model)
         {
             try
             {
-                if (File == null || File.Length == 0)
+                if (model.File == null || model.File.Length == 0)
                 {
                     TempData["ErrorMessage"] = "Пожалуйста, загрузите файл.";
                     return RedirectToAction("Upload");
@@ -60,18 +65,18 @@ namespace WebApplication4.Controllers
                     Directory.CreateDirectory(uploadsFolder);
                 }
 
-                var fileName = Path.GetFileName(File.FileName);
+                var fileName = Path.GetFileName(model.File.FileName);
                 var filePath = Path.Combine(uploadsFolder, fileName);
 
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
-                    await File.CopyToAsync(stream);
+                    await model.File.CopyToAsync(stream);
                 }
 
                 var newSong = new Song
                 {
-                    Title = Title,
-                    GenreId = GenreId,
+                    Title = model.Title,
+                    GenreId = model.GenreId,
                     FilePath = "/uploads/" + fileName,
                     UserId = user.Id
                 };

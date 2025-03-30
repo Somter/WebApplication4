@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebApplication4.Models;
+using WebApplication4.ViewModels;
 
 namespace WebApplication4.Controllers
 {
@@ -42,7 +43,13 @@ namespace WebApplication4.Controllers
                     return NotFound();
                 }
 
-                return View(genre);
+                var viewModel = new GenreEditViewModel
+                {
+                    Id = genre.Id,
+                    Name = genre.Name
+                };
+
+                return View(viewModel);
             }
             catch (Exception ex)
             {
@@ -95,20 +102,25 @@ namespace WebApplication4.Controllers
         }
 
         [HttpPost]
-        public IActionResult Edit(Genre model)
+        public IActionResult Edit(GenreEditViewModel model)
         {
             try
             {
-                var genre = _context.Genre.FirstOrDefault(g => g.Id == model.Id);
-                if (genre == null)
+                if (ModelState.IsValid)
                 {
-                    return NotFound();
+                    var genre = _context.Genre.FirstOrDefault(g => g.Id == model.Id);
+                    if (genre == null)
+                    {
+                        return NotFound();
+                    }
+
+                    genre.Name = model.Name;
+                    _context.SaveChanges();
+
+                    return RedirectToAction("Index");
                 }
 
-                genre.Name = model.Name;
-                _context.SaveChanges();
-
-                return RedirectToAction("Index");
+                return View(model);
             }
             catch (Exception ex)
             {
@@ -119,27 +131,37 @@ namespace WebApplication4.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(Genre model)
+        public IActionResult Create(GenreCreateViewModel model)
         {
-            try
+            if (ModelState.IsValid)
             {
-                if (_context.Genre.Any(g => g.Name == model.Name))
+                try
                 {
-                    ViewBag.Error = "Такой жанр уже существует";
-                    return View(model);
+                    if (_context.Genre.Any(g => g.Name == model.Name))
+                    {
+                        ViewBag.Error = "Такой жанр уже существует";
+                        return View(model);
+                    }
+
+                    var newGenre = new Genre
+                    {
+                        Name = model.Name
+                    };
+
+                    _context.Genre.Add(newGenre);
+                    _context.SaveChanges();
+
+                    return RedirectToAction("Index");
                 }
-
-                _context.Genre.Add(model);
-                _context.SaveChanges();
-
-                return RedirectToAction("Index");
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Ошибка при создании жанра: {ex.Message}");
+                    TempData["ErrorMessage"] = "Ошибка при добавлении жанра.";
+                    return RedirectToAction("Create");
+                }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Ошибка при создании жанра: {ex.Message}");
-                TempData["ErrorMessage"] = "Ошибка при добавлении жанра.";
-                return RedirectToAction("Create");
-            }
+
+            return View(model);
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿@{
+﻿@model WebApplication4.ViewModels.MusicUploadViewModel
+
+@{
     ViewBag.Title = "Song Page";
 }
 
@@ -21,8 +23,8 @@
 
 <form asp-action="Upload" asp-controller="Music" method="post" enctype="multipart/form-data">
     <div class="mb-3">
-        <label for="Title" class="form-label">Название композиции:</label>  
-        <input type="text" name="Title" class="form-control" required />
+        <label for="Title" class="form-label">Название композиции:</label>
+        <input type="text" name="Title" class="form-control" value="@Model.Title" required />
     </div>
 
     <div class="mb-3">
@@ -34,7 +36,7 @@
         <label for="GenreId" class="form-label">Выберите жанр:</label>
         <select name="GenreId" class="form-control" required>
             <option value="">Выберите жанр...</option>
-            @foreach (var genre in ViewBag.Genres)
+            @foreach (var genre in Model.Genres)
             {
                 <option value="@genre.Id">@genre.Name</option>
             }

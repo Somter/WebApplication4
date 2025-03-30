@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Linq;
 using WebApplication4.Models;
+using WebApplication4.ViewModels;
+using Microsoft.AspNetCore.Http;
 
 namespace WebApplication4.Controllers
 {
@@ -28,10 +31,13 @@ namespace WebApplication4.Controllers
             }
         }
 
-        public IActionResult Login() => View();
+        public IActionResult Login()
+        {
+            return View(new AdminLoginViewModel());
+        }
 
         [HttpPost]
-        public IActionResult Login(Admin model)
+        public IActionResult Login(AdminLoginViewModel model)
         {
             try
             {
@@ -40,10 +46,10 @@ namespace WebApplication4.Controllers
                     return View(model);
                 }
 
-                var admin = _context.Admin.FirstOrDefault(u => u.Username == model.Username && u.PasswordHash == model.PasswordHash);
+                var admin = _context.Admin.FirstOrDefault(u => u.Username == model.Username && u.PasswordHash == model.Password);
                 if (admin == null)
                 {
-                    ViewBag.Error = "Неверное имя или пароль";
+                    model.ErrorMessage = "Неверное имя или пароль";
                     return View(model);
                 }
 
@@ -52,19 +58,48 @@ namespace WebApplication4.Controllers
             catch (Exception ex)
             {
                 Console.WriteLine($"Ошибка при входе администратора: {ex.Message}");
-                TempData["ErrorMessage"] = "Ошибка при попытке входа.";
-                return RedirectToAction("Login");
+                model.ErrorMessage = "Ошибка при попытке входа.";
+                return View(model);
             }
         }
 
-        public IActionResult ActivateUser(int Id)
+        [HttpGet]
+        public IActionResult EditUser(int id)
         {
             try
             {
-                var user = _context.Users.FirstOrDefault(u => u.Id == Id);
+                var user = _context.Users.FirstOrDefault(u => u.Id == id);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+
+                var editUserViewModel = new EditUserViewModel
+                {
+                    Id = user.Id,
+                    Username = user.Username,
+                    Email = user.Email,
+                    IsActive = user.IsActive
+                };
+
+                return View(editUserViewModel);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при загрузке страницы редактирования пользователя: {ex.Message}");
+                TempData["ErrorMessage"] = "Ошибка при загрузке страницы редактирования.";
+                return RedirectToAction("Index");
+            }
+        }
+
+        public IActionResult ActivateUser(int id)
+        {
+            try
+            {
+                var user = _context.Users.FirstOrDefault(u => u.Id == id);
                 if (user != null)
                 {
-                    user.IsActive = true;
+                    user.IsActive = !user.IsActive;
                     _context.SaveChanges();
                 }
 
@@ -78,17 +113,50 @@ namespace WebApplication4.Controllers
             }
         }
 
-        public IActionResult DeleteUser(int Id)
+
+        [HttpPost]
+        public IActionResult EditUser(EditUserViewModel model)
         {
             try
             {
-                var user = _context.Users.FirstOrDefault(u => u.Id == Id);
+                if (!ModelState.IsValid)
+                {
+                    return View(model);
+                }
+
+                var user = _context.Users.FirstOrDefault(u => u.Id == model.Id);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+
+                user.Username = model.Username;
+                user.Email = model.Email;
+                user.IsActive = model.IsActive;
+
+                _context.SaveChanges();
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при редактировании пользователя: {ex.Message}");
+                TempData["ErrorMessage"] = "Ошибка при редактировании пользователя.";
+                return RedirectToAction("Index");
+            }
+        }
+
+        [HttpPost]
+        public IActionResult DeleteUser(int id)
+        {
+            try
+            {
+                var user = _context.Users.FirstOrDefault(u => u.Id == id);
                 if (user != null)
                 {
                     var songs = _context.Songs.Where(x => x.UserId == user.Id).ToList();
-                    foreach (var item in songs)
+                    foreach (var song in songs)
                     {
-                        item.UserId = null;
+                        song.UserId = null;  
                     }
 
                     _context.Users.Remove(user);
@@ -105,52 +173,7 @@ namespace WebApplication4.Controllers
             }
         }
 
-        [HttpGet]
-        public IActionResult EditUser(int Id)
-        {
-            try
-            {
-                var user = _context.Users.FirstOrDefault(u => u.Id == Id);
-                if (user == null)
-                {
-                    return NotFound();
-                }
 
-                return View(user);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Ошибка при загрузке страницы редактирования пользователя: {ex.Message}");
-                TempData["ErrorMessage"] = "Ошибка при загрузке страницы редактирования.";
-                return RedirectToAction("Index");
-            }
-        }
 
-        [HttpPost]
-        public IActionResult EditUser(User model)
-        {
-            try
-            {
-                var user = _context.Users.FirstOrDefault(u => u.Id == model.Id);
-                if (user == null)
-                {
-                    return NotFound();
-                }
-
-                user.Username = model.Username;
-                user.Email = model.Email;
-                user.IsActive = model.IsActive;
-
-                _context.SaveChanges();
-
-                return RedirectToAction("Index");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Ошибка при редактировании пользователя: {ex.Message}");
-                TempData["ErrorMessage"] = "Ошибка при редактировании пользователя.";
-                return RedirectToAction("Index");
-            }
-        }
     }
 }

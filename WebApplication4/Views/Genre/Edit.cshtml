@@ -1,7 +1,7 @@
-﻿@model WebApplication4.Models.Genre
+﻿@model WebApplication4.ViewModels.GenreEditViewModel
 
 @{
-    ViewData["Title"] = "Редактировать жандр";
+    ViewData["Title"] = "Редактировать жанр";
 }
 
 <h2>Редактировать жанр</h2>
@@ -21,6 +21,6 @@
             <span asp-validation-for="Name" class="text-danger"></span>
         </div>
 
-        <button type="submit" class="btn btn-primary">Создать</button>
+        <button type="submit" class="btn btn-primary">Сохранить</button>
     </form>
 </div>
