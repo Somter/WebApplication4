@@ -3,16 +3,19 @@ using WebApplication4.Models;
 using System.Linq;
 using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
+using WebApplication4.Repository;
 
 namespace WebApplication4.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IMusicRepository _musicRepository;
+        private readonly IUserRepository _userRepository;
 
-        public HomeController(ApplicationDbContext context)
+        public HomeController(IMusicRepository musicRepository, IUserRepository userRepository)
         {
-            _context = context;
+            _musicRepository = musicRepository;
+            _userRepository = userRepository;
         }
 
         public async Task<IActionResult> Index()
@@ -21,16 +24,16 @@ namespace WebApplication4.Controllers
             {
                 int? userId = HttpContext.Session.GetInt32("UserId");
 
-                var songs = await _context.Songs.Include(s => s.Genre).ToListAsync();
+                var songs = await _musicRepository.GetAllSongsWithGenresAsync();
                 ViewBag.Songs = songs;
 
+                User? user = null;
                 if (userId != null)
                 {
-                    var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
-                    return View(user);
+                    user = await _userRepository.GetUserByIdAsync(userId.Value);
                 }
 
-                return View(null);
+                return View(user);
             }
             catch (Exception ex)
             {

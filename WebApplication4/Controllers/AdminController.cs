@@ -4,23 +4,27 @@ using System.Linq;
 using WebApplication4.Models;
 using WebApplication4.ViewModels;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using WebApplication4.Repository;
 
 namespace WebApplication4.Controllers
 {
     public class AdminController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IUserRepository _userRepository;
+        private readonly IAdminRepository _adminRepository;
 
-        public AdminController(ApplicationDbContext context)
+        public AdminController(IUserRepository userRepository, IAdminRepository adminRepository)
         {
-            _context = context;
+            _userRepository = userRepository;
+            _adminRepository = adminRepository;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             try
             {
-                var users = _context.Users.ToList();
+                var users = await _userRepository.GetAllUsersAsync();
                 return View(users);
             }
             catch (Exception ex)
@@ -37,7 +41,7 @@ namespace WebApplication4.Controllers
         }
 
         [HttpPost]
-        public IActionResult Login(AdminLoginViewModel model)
+        public async Task<IActionResult> Login(AdminLoginViewModel model)
         {
             try
             {
@@ -46,8 +50,8 @@ namespace WebApplication4.Controllers
                     return View(model);
                 }
 
-                var admin = _context.Admin.FirstOrDefault(u => u.Username == model.Username && u.PasswordHash == model.Password);
-                if (admin == null)
+                var admin = await _adminRepository.GetAdminByUsernameAsync(model.Username);
+                if (admin == null || admin.PasswordHash != model.Password)
                 {
                     model.ErrorMessage = "Неверное имя или пароль";
                     return View(model);
@@ -64,11 +68,11 @@ namespace WebApplication4.Controllers
         }
 
         [HttpGet]
-        public IActionResult EditUser(int id)
+        public async Task<IActionResult> EditUser(int id)
         {
             try
             {
-                var user = _context.Users.FirstOrDefault(u => u.Id == id);
+                var user = await _userRepository.GetUserByIdAsync(id);
                 if (user == null)
                 {
                     return NotFound();
@@ -92,30 +96,8 @@ namespace WebApplication4.Controllers
             }
         }
 
-        public IActionResult ActivateUser(int id)
-        {
-            try
-            {
-                var user = _context.Users.FirstOrDefault(u => u.Id == id);
-                if (user != null)
-                {
-                    user.IsActive = !user.IsActive;
-                    _context.SaveChanges();
-                }
-
-                return RedirectToAction("Index");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Ошибка при активации пользователя: {ex.Message}");
-                TempData["ErrorMessage"] = "Ошибка при активации пользователя.";
-                return RedirectToAction("Index");
-            }
-        }
-
-
         [HttpPost]
-        public IActionResult EditUser(EditUserViewModel model)
+        public async Task<IActionResult> EditUser(EditUserViewModel model)
         {
             try
             {
@@ -124,7 +106,7 @@ namespace WebApplication4.Controllers
                     return View(model);
                 }
 
-                var user = _context.Users.FirstOrDefault(u => u.Id == model.Id);
+                var user = await _userRepository.GetUserByIdAsync(model.Id);
                 if (user == null)
                 {
                     return NotFound();
@@ -134,7 +116,7 @@ namespace WebApplication4.Controllers
                 user.Email = model.Email;
                 user.IsActive = model.IsActive;
 
-                _context.SaveChanges();
+                await _userRepository.UpdateUserAsync(user);
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
@@ -146,21 +128,30 @@ namespace WebApplication4.Controllers
         }
 
         [HttpPost]
-        public IActionResult DeleteUser(int id)
+        public async Task<IActionResult> ToggleUserStatus(int id)
         {
             try
             {
-                var user = _context.Users.FirstOrDefault(u => u.Id == id);
+                await _userRepository.ToggleUserStatusAsync(id);  
+                return RedirectToAction("Index"); 
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при изменении статуса пользователя: {ex.Message}");
+                TempData["ErrorMessage"] = "Ошибка при изменении статуса пользователя.";
+                return RedirectToAction("Index");
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteUser(int id)
+        {
+            try
+            {
+                var user = await _userRepository.GetUserByIdAsync(id);
                 if (user != null)
                 {
-                    var songs = _context.Songs.Where(x => x.UserId == user.Id).ToList();
-                    foreach (var song in songs)
-                    {
-                        song.UserId = null;  
-                    }
-
-                    _context.Users.Remove(user);
-                    _context.SaveChanges();
+                    await _userRepository.DeleteUserAsync(user); 
                 }
 
                 return RedirectToAction("Index");
@@ -172,8 +163,5 @@ namespace WebApplication4.Controllers
                 return RedirectToAction("Index");
             }
         }
-
-
-
     }
 }

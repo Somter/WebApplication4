@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using WebApplication4.Models;
+using WebApplication4.Repository;
 using WebApplication4.ViewModels;
 
 namespace WebApplication4.Controllers
@@ -9,13 +10,16 @@ namespace WebApplication4.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IMusicRepository _musicRepository;
 
-        public MusicController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment)
+        public MusicController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, IMusicRepository musicRepository)
         {
             _context = context;
             _webHostEnvironment = webHostEnvironment;
+            _musicRepository = musicRepository;
         }
 
+        // GET: /Music/Upload
         [HttpGet]
         public IActionResult Upload()
         {
@@ -23,7 +27,7 @@ namespace WebApplication4.Controllers
             {
                 var model = new MusicUploadViewModel
                 {
-                    Genres = _context.Genre.ToList()
+                    Genres = _context.Genre.ToList() // Получение списка жанров
                 };
 
                 return View(model);
@@ -36,6 +40,7 @@ namespace WebApplication4.Controllers
             }
         }
 
+        // POST: /Music/Upload
         [HttpPost]
         public async Task<IActionResult> Upload(MusicUploadViewModel model)
         {
@@ -95,6 +100,7 @@ namespace WebApplication4.Controllers
             }
         }
 
+        // GET: /Music/Download/{fileName}
         public IActionResult Download(string fileName)
         {
             try
