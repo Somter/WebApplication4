@@ -32,6 +32,7 @@ namespace WebApplication4.Repository
                                  .Include(s => s.Genre)
                                  .ToListAsync();
         }
+
         public async Task<List<Song>> SearchSongsByTitleAsync(string title)
         {
             return await _context.Songs
@@ -45,6 +46,7 @@ namespace WebApplication4.Repository
             _context.Songs.Update(song);
             await _context.SaveChangesAsync();
         }
+
         public async Task DeleteSongAsync(int songId)
         {
             var song = await _context.Songs.FindAsync(songId);
@@ -54,11 +56,11 @@ namespace WebApplication4.Repository
                 await _context.SaveChangesAsync();
             }
         }
-
         public async Task<List<Genre>> GetAllGenresAsync()
         {
             return await _context.Genre.ToListAsync();
         }
+
         public async Task<Song> GetSongByIdAsync(int songId)
         {
             return await _context.Songs

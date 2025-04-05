@@ -1,0 +1,63 @@
+﻿@model List<WebApplication4.Models.Song>
+
+@{
+    ViewData["Title"] = "Музыкальная панель";
+    Layout = "_Layout";
+}
+
+<div class="header">
+    <div class="logo">SashaMusic</div>
+
+    <div class="logout">
+        <a href="@Url.Action("Index", "Home")" class="btn btn-logout">Выйти</a>
+    </div>
+</div>
+
+<table class="table" style="margin-top: 20px;">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Название</th>
+            <th>Жанр</th>
+           
+            <th>Пользователь</th>
+            <th>Скачать</th>
+            <th>Редактировать</th>
+            <th>Удалить</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var song in Model)
+        {
+            <tr>
+                <td class="text-white">@song.Id</td>
+                <td class="text-white">@song.Title</td>
+                <td class="text-white">@song.Genre.Name</td>
+                
+                <td class="text-white">@song.UserId</td>
+                <td>
+                    <a href="@Url.Action("Download", "Music", new { fileName = song.FilePath.Split('/').Last() })"
+                       class="btn btn-success">⬇ Скачать</a>
+                </td>
+                <td>
+                    <a asp-action="EditSong" asp-controller="Music" asp-route-id="@song.Id"
+                       class="btn-edit">
+                        ✏️
+                    </a>
+                </td>
+                <td>
+                    <a href="#" class="btn-delete" onclick="event.preventDefault(); document.getElementById('delete-form-@song.Id').submit();">
+                        🗑
+                    </a>
+                    <form id="delete-form-@song.Id" asp-action="DeleteSong" asp-controller="Music" asp-route-id="@song.Id" method="post" style="display:none;">
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<nav class="nav-links" style="margin-top: 30px;">
+    <a href="@Url.Action("Index", "Genre")" class="btn btn-logout">Жанры</a>
+    <a href="@Url.Action("UploadAdmin", "Music")" class="btn btn-logout">Загрузить музыку</a> 
+</nav>
