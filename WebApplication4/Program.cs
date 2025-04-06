@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using WebApplication4.Models;
-using WebApplication4.Repository;
+using WebApplication4.DAL.EF;
 using WebApplication4.Services;
 
 var builder = WebApplication.CreateBuilder(args);
