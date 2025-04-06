@@ -14,4 +14,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\WebApplication4.BLL\WebApplication4.BLL.csproj" />
+  </ItemGroup>
+
 </Project>
