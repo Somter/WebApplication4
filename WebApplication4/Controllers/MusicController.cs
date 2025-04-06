@@ -239,5 +239,79 @@ namespace WebApplication4.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var song = await _musicRepository.GetSongByIdAsync(id);
+            if (song == null)
+            {
+                return NotFound();
+            }
+
+            var viewModel = new MusicUploadViewModel
+            {
+                Id = song.Id,
+                Title = song.Title,
+                GenreId = song.GenreId,
+                Genres = await _musicRepository.GetAllGenresAsync()
+            };
+
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(MusicUploadViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                Console.WriteLine("ModelState недействителен:");
+                foreach (var key in ModelState.Keys)
+                {
+                    var state = ModelState[key];
+                    foreach (var error in state.Errors)
+                    {
+                        Console.WriteLine($"{key}: {error.ErrorMessage}");
+                    }
+                }
+
+                model.Genres = await _musicRepository.GetAllGenresAsync();
+                return View(model);
+            }
+
+            var song = await _musicRepository.GetSongByIdAsync(model.Id);
+            if (song == null)
+            {
+                return NotFound();
+            }
+
+            song.Title = model.Title;
+            song.GenreId = model.GenreId;
+
+            if (model.File != null && model.File.Length > 0)
+            {
+                var oldFilePath = Path.Combine(_webHostEnvironment.WebRootPath, song.FilePath.TrimStart('/'));
+                if (System.IO.File.Exists(oldFilePath))
+                {
+                    System.IO.File.Delete(oldFilePath);
+                }
+
+                var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
+                var fileName = Path.GetFileName(model.File.FileName);
+                var filePath = Path.Combine(uploadsFolder, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await model.File.CopyToAsync(stream);
+                }
+
+                song.FilePath = "/uploads/" + fileName;
+            }
+
+            await _musicRepository.UpdateSongAsync(song);
+            TempData["SuccessMessage"] = "Песня успешно обновлена!";
+            return RedirectToAction("Index");
+        }
+
+
     }
 }

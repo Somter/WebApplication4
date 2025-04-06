@@ -1,5 +1,41 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model WebApplication4.ViewModels.MusicUploadViewModel
+
 @{
+    ViewData["Title"] = "Редактировать песню";
+    Layout = "_Layout";
+}
+
+<h2>Редактировать песню</h2>
+
+<!-- Показываем общее сообщение о валидации -->
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+<form asp-action="Edit" method="post" enctype="multipart/form-data">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="form-group">
+        <label asp-for="Title">Название песни</label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span> <!-- ⬅️ сюда -->
+    </div>
+
+    <div class="form-group">
+        <label asp-for="GenreId">Жанр</label>
+        <select asp-for="GenreId" class="form-control" asp-items="@(new SelectList(Model.Genres, "Id", "Name"))"></select>
+        <span asp-validation-for="GenreId" class="text-danger"></span> <!-- ⬅️ сюда -->
+    </div>
+
+    <div class="form-group">
+        <label asp-for="File">Загрузить новый файл (опционально)</label>
+        <input asp-for="File" type="file" class="form-control" />
+        <span asp-validation-for="File" class="text-danger"></span> <!-- ⬅️ если хочешь для файла -->
+    </div>
+
+    <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+    <a href="@Url.Action("Index", "Music")" class="btn btn-secondary">Отмена</a>
+</form>
+
+<!-- Скрипты для работы клиентской валидации -->
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
 }
