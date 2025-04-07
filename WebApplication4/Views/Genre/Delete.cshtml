@@ -9,7 +9,7 @@
 
     <form method="post" asp-action="DeleteConfirmed" asp-route-id="@Model.Id">
         <button type="submit" class="btn btn-danger">Удалить</button>
-        <a href="@Url.Action("Index", "Genre")" class="btn btn-secondary">Отменить</a>
+        <a href="@Url.Action("DeleteConfirmed", "Genre")" class="btn btn-secondary">Отменить</a>
     </form>
 </div>
 

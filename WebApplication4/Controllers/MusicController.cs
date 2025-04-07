@@ -81,6 +81,51 @@ namespace WebApplication4.Controllers
             return RedirectToAction("Upload");
         }
 
+        [HttpGet]
+        public async Task<IActionResult> UploadAdmin()
+        {
+            var model = new MusicUploadViewModel
+            {
+                Genres = await _musicService.GetAllGenresAsync()
+            };
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UploadAdmin(MusicUploadViewModel model)
+        {
+            if (!ModelState.IsValid || model.File == null || model.File.Length == 0)
+            {
+                TempData["ErrorMessage"] = "Неверные данные или отсутствует файл.";
+                model.Genres = await _musicService.GetAllGenresAsync();
+                return View(model);
+            }
+
+            var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
+            if (!Directory.Exists(uploadsFolder))
+                Directory.CreateDirectory(uploadsFolder);
+
+            var fileName = Path.GetFileName(model.File.FileName);
+            var filePath = Path.Combine(uploadsFolder, fileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await model.File.CopyToAsync(stream);
+            }
+
+            var songDto = new SongDTO
+            {
+                Title = model.Title,
+                GenreId = model.GenreId ?? 0,
+                FilePath = "/uploads/" + fileName,
+                UserId = null 
+            };
+
+            await _musicService.AddSongAsync(songDto);
+            TempData["SuccessMessage"] = "Песня успешно загружена администратором!";
+            return RedirectToAction("UploadAdmin");
+        }
+
         public IActionResult Download(string fileName)
         {
             if (string.IsNullOrEmpty(fileName)) return NotFound("Файл не найден.");
