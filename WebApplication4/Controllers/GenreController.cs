@@ -1,24 +1,24 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using WebApplication4.Models;
-using WebApplication4.Repository;
+using WebApplication4.BLL.DTO;
+using WebApplication4.BLL.Interfaces;
 using WebApplication4.ViewModels;
 
 namespace WebApplication4.Controllers
 {
     public class GenreController : Controller
     {
-        private readonly IGenreRepository _genreRepository;
+        private readonly IGenreService _genreService;
 
-        public GenreController(IGenreRepository genreRepository)
+        public GenreController(IGenreService genreService)
         {
-            _genreRepository = genreRepository;
+            _genreService = genreService;
         }
 
         public IActionResult Index()
         {
             try
             {
-                var genres = _genreRepository.GetAllGenres();
+                var genres = _genreService.GetAllGenres();
                 return View(genres);
             }
             catch (Exception ex)
@@ -34,18 +34,23 @@ namespace WebApplication4.Controllers
         [HttpPost]
         public IActionResult Create(GenreCreateViewModel model)
         {
-            if (!ModelState.IsValid) return View(model);
+            if (!ModelState.IsValid)
+                return View(model);
 
             try
             {
-                if (_genreRepository.GenreExists(model.Name))
+                if (_genreService.GenreExists(model.Name))
                 {
                     ViewBag.Error = "Такой жанр уже существует";
                     return View(model);
                 }
 
-                var newGenre = new Genre { Name = model.Name };
-                _genreRepository.AddGenre(newGenre);
+                var genreDto = new GenreDTO
+                {
+                    Name = model.Name
+                };
+
+                _genreService.AddGenre(genreDto);
 
                 return RedirectToAction("Index");
             }
@@ -61,7 +66,7 @@ namespace WebApplication4.Controllers
         {
             try
             {
-                var genre = _genreRepository.GetGenreById(id);
+                var genre = _genreService.GetGenreById(id);
                 if (genre == null) return NotFound();
 
                 var viewModel = new GenreEditViewModel
@@ -83,15 +88,18 @@ namespace WebApplication4.Controllers
         [HttpPost]
         public IActionResult Edit(GenreEditViewModel model)
         {
-            if (!ModelState.IsValid) return View(model);
+            if (!ModelState.IsValid)
+                return View(model);
 
             try
             {
-                var genre = _genreRepository.GetGenreById(model.Id);
-                if (genre == null) return NotFound();
+                var genreDto = new GenreDTO
+                {
+                    Id = model.Id,
+                    Name = model.Name
+                };
 
-                genre.Name = model.Name;
-                _genreRepository.UpdateGenre(genre);
+                _genreService.UpdateGenre(genreDto);
 
                 return RedirectToAction("Index");
             }
@@ -107,7 +115,7 @@ namespace WebApplication4.Controllers
         {
             try
             {
-                var genre = _genreRepository.GetGenreById(id);
+                var genre = _genreService.GetGenreById(id);
                 if (genre == null) return NotFound();
 
                 return View(genre);
@@ -125,7 +133,7 @@ namespace WebApplication4.Controllers
         {
             try
             {
-                _genreRepository.DeleteGenre(id);
+                _genreService.DeleteGenre(id);
                 return RedirectToAction("Index");
             }
             catch (Exception ex)

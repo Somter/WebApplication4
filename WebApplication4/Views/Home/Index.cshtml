@@ -1,4 +1,4 @@
-﻿@model WebApplication4.Models.User
+﻿@model List<WebApplication4.ViewModels.UserDisplayViewModel>
 
 @{
     ViewData["Title"] = "Home Page";
@@ -8,7 +8,7 @@
     <nav style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto;">
         <h1 style="color: orange; margin: 0;">SashaMusic</h1>
         <div>
-            @if (Model != null && Model.IsActive)
+            @if (Model != null && Model.Any() && Model.FirstOrDefault()?.IsActive == true)
             {
                 <a asp-action="Upload" asp-controller="Music"
                    style="background-color: #ff8c00; color: black; padding: 10px 15px; text-decoration: none; border-radius: 5px; margin-right: 10px;">
@@ -33,16 +33,17 @@
         </div>
     </nav>
 </header>
+
 <div class="container">
     <h2>Список песен</h2>
 
-    @if (ViewBag.Songs != null && ((List<WebApplication4.Models.Song>)ViewBag.Songs).Any())
+    @if (ViewBag.Songs != null && ((List<WebApplication4.BLL.DTO.SongDTO>)ViewBag.Songs).Any())
     {
         <ul>
-            @foreach (var song in (List<WebApplication4.Models.Song>)ViewBag.Songs)
+            @foreach (var song in (List<WebApplication4.BLL.DTO.SongDTO>)ViewBag.Songs)
             {
                 <li>
-                    <strong>@song.Title</strong> - @song.Genre?.Name
+                    <strong>@song.Title</strong> - @song.Genre?.Name    
                     <br />
                     <audio controls>
                         <source src="@Url.Content(song.FilePath)" type="audio/mpeg" />

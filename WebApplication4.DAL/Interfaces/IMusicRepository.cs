@@ -12,6 +12,7 @@ namespace WebApplication4.DAL.Interfaces
         Task DeleteSongAsync(int songId);
         Task<List<Genre>> GetAllGenresAsync();
         Task<Song> GetSongByIdAsync(int songId);
+        Task AddSongAsync(Song song);
     }
 
 }

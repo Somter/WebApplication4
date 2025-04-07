@@ -7,6 +7,8 @@ using WebApplication4.BLL.DTO;
 
 namespace WebApplication4.BLL.Interfaces
 {
+    using WebApplication4.BLL.DTO;
+
     public interface IMusicService
     {
         Task<List<SongDTO>> GetAllSongsAsync();
@@ -16,5 +18,8 @@ namespace WebApplication4.BLL.Interfaces
         Task<List<SongDTO>> SearchSongsByTitleAsync(string title);
         Task<bool> UpdateSongAsync(SongDTO songDto);
         Task<bool> DeleteSongAsync(int id);
+        Task AddSongAsync(SongDTO songDto);
+        Task<List<GenreDTO>> GetAllGenresAsync();
     }
+
 }

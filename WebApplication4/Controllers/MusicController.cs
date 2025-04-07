@@ -1,22 +1,20 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
-using WebApplication4.Models;
-using WebApplication4.Repository;
 using WebApplication4.ViewModels;
+using WebApplication4.BLL.Interfaces;
+using WebApplication4.BLL.DTO;
 
 namespace WebApplication4.Controllers
 {
     public class MusicController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IMusicService _musicService;
         private readonly IWebHostEnvironment _webHostEnvironment;
-        private readonly IMusicRepository _musicRepository;
 
-        public MusicController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, IMusicRepository musicRepository)
+        public MusicController(IMusicService musicService, IWebHostEnvironment webHostEnvironment)
         {
-            _context = context;
+            _musicService = musicService;
             _webHostEnvironment = webHostEnvironment;
-            _musicRepository = musicRepository;
         }
 
         [HttpGet]
@@ -24,7 +22,7 @@ namespace WebApplication4.Controllers
         {
             try
             {
-                var songs = await _musicRepository.GetAllSongsWithGenresAsync();
+                var songs = await _musicService.GetAllSongsAsync();
                 return View(songs);
             }
             catch (Exception ex)
@@ -35,111 +33,65 @@ namespace WebApplication4.Controllers
             }
         }
 
-
         [HttpGet]
-        public IActionResult Upload()
+        public async Task<IActionResult> Upload()
         {
-            try
+            var model = new MusicUploadViewModel
             {
-                var model = new MusicUploadViewModel
-                {
-                    Genres = _context.Genre.ToList() 
-                };
-
-                return View(model);
-            }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessage"] = "Ошибка при загрузке страницы загрузки.";
-                Console.WriteLine($"Ошибка при отображении страницы Upload: {ex.Message}");
-                return RedirectToAction("Index", "Home");
-            }
+                Genres = await _musicService.GetAllGenresAsync()
+            };
+            return View(model);
         }
 
         [HttpPost]
         public async Task<IActionResult> Upload(MusicUploadViewModel model)
         {
-            try
+            if (!ModelState.IsValid || model.File == null || model.File.Length == 0)
             {
-                if (model.File == null || model.File.Length == 0)
-                {
-                    TempData["ErrorMessage"] = "Пожалуйста, загрузите файл.";
-                    return RedirectToAction("Upload");
-                }
-
-                var userId = HttpContext.Session.GetInt32("UserId");
-                if (userId == null)
-                {
-                    return RedirectToAction("Login", "Regist");
-                }
-
-                var user = _context.Users.FirstOrDefault(u => u.Id == userId);
-                if (user == null)
-                {
-                    return RedirectToAction("Login", "Regist");
-                }
-
-                var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
-                if (!Directory.Exists(uploadsFolder))
-                {
-                    Directory.CreateDirectory(uploadsFolder);
-                }
-
-                var fileName = Path.GetFileName(model.File.FileName);
-                var filePath = Path.Combine(uploadsFolder, fileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await model.File.CopyToAsync(stream);
-                }
-
-                var newSong = new Song
-                {
-                    Title = model.Title,
-                    GenreId = model.GenreId,
-                    FilePath = "/uploads/" + fileName,
-                    UserId = user.Id
-                };
-
-                _context.Songs.Add(newSong);
-                await _context.SaveChangesAsync();
-
-                TempData["SuccessMessage"] = "Песня успешно загружена!";
-                return RedirectToAction("Upload");
+                TempData["ErrorMessage"] = "Неверные данные или отсутствует файл.";
+                model.Genres = await _musicService.GetAllGenresAsync();
+                return View(model);
             }
-            catch (Exception ex)
+
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null) return RedirectToAction("Login", "Regist");
+
+            var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
+            if (!Directory.Exists(uploadsFolder))
+                Directory.CreateDirectory(uploadsFolder);
+
+            var fileName = Path.GetFileName(model.File.FileName);
+            var filePath = Path.Combine(uploadsFolder, fileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
             {
-                TempData["ErrorMessage"] = "Ошибка при загрузке песни. Попробуйте снова.";
-                Console.WriteLine($"Ошибка загрузки песни: {ex.Message}");
-                return RedirectToAction("Upload");
+                await model.File.CopyToAsync(stream);
             }
+
+            var songDto = new SongDTO
+            {
+                Title = model.Title,
+                GenreId = model.GenreId ?? 0,
+                FilePath = "/uploads/" + fileName,
+                UserId = userId
+            };
+
+            await _musicService.AddSongAsync(songDto);
+            TempData["SuccessMessage"] = "Песня успешно загружена!";
+            return RedirectToAction("Upload");
         }
 
         public IActionResult Download(string fileName)
         {
-            try
-            {
-                if (string.IsNullOrEmpty(fileName))
-                {
-                    return NotFound("Файл не найден.");
-                }
+            if (string.IsNullOrEmpty(fileName)) return NotFound("Файл не найден.");
 
-                var uploadsPath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
-                var fullPath = Path.Combine(uploadsPath, fileName);
+            var uploadsPath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
+            var fullPath = Path.Combine(uploadsPath, fileName);
 
-                if (!System.IO.File.Exists(fullPath))
-                {
-                    return NotFound("Файл не найден.");
-                }
+            if (!System.IO.File.Exists(fullPath)) return NotFound("Файл не найден.");
 
-                var fileBytes = System.IO.File.ReadAllBytes(fullPath);
-                return File(fileBytes, "audio/mpeg", fileName);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Ошибка при скачивании файла {fileName}: {ex.Message}");
-                return NotFound("Ошибка при скачивании файла.");
-            }
+            var fileBytes = System.IO.File.ReadAllBytes(fullPath);
+            return File(fileBytes, "audio/mpeg", fileName);
         }
 
         [HttpPost]
@@ -147,7 +99,7 @@ namespace WebApplication4.Controllers
         {
             try
             {
-                var song = await _musicRepository.GetSongByIdAsync(id);
+                var song = await _musicService.GetSongByIdAsync(id);
                 if (song == null)
                 {
                     TempData["ErrorMessage"] = "Песня не найдена.";
@@ -160,7 +112,7 @@ namespace WebApplication4.Controllers
                     System.IO.File.Delete(filePath);
                 }
 
-                await _musicRepository.DeleteSongAsync(id);
+                await _musicService.DeleteSongAsync(id);
                 TempData["SuccessMessage"] = "Песня успешно удалена!";
             }
             catch (Exception ex)
@@ -173,87 +125,17 @@ namespace WebApplication4.Controllers
         }
 
         [HttpGet]
-        public IActionResult UploadAdmin()
-        {
-            try
-            {
-                var model = new MusicUploadViewModel
-                {
-                    Genres = _context.Genre.ToList()
-                };
-
-                return View(model);
-            }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessage"] = "Ошибка при загрузке страницы загрузки для администратора.";
-                Console.WriteLine($"Ошибка: {ex.Message}");
-                return RedirectToAction("Index", "Home");
-            }
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> UploadAdmin(MusicUploadViewModel model)
-        {
-            try
-            {
-                if (model.File == null || model.File.Length == 0)
-                {
-                    TempData["ErrorMessage"] = "Пожалуйста, загрузите файл.";
-                    return RedirectToAction("UploadAdmin");
-                }
-
-                var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
-                if (!Directory.Exists(uploadsFolder))
-                {
-                    Directory.CreateDirectory(uploadsFolder);
-                }
-
-                var fileName = Path.GetFileName(model.File.FileName);
-                var filePath = Path.Combine(uploadsFolder, fileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await model.File.CopyToAsync(stream);
-                }
-
-                var newSong = new Song
-                {
-                    Title = model.Title,
-                    GenreId = model.GenreId,
-                    FilePath = "/uploads/" + fileName,
-                    UserId = null 
-                };
-
-                _context.Songs.Add(newSong);
-                await _context.SaveChangesAsync();
-
-                TempData["SuccessMessage"] = "Песня успешно загружена администратором!";
-                return RedirectToAction("UploadAdmin");
-            }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessage"] = "Ошибка при загрузке песни. Попробуйте снова.";
-                Console.WriteLine($"Ошибка: {ex.Message}");
-                return RedirectToAction("UploadAdmin");
-            }
-        }
-
-        [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            var song = await _musicRepository.GetSongByIdAsync(id);
-            if (song == null)
-            {
-                return NotFound();
-            }
+            var song = await _musicService.GetSongByIdAsync(id);
+            if (song == null) return NotFound();
 
             var viewModel = new MusicUploadViewModel
             {
                 Id = song.Id,
                 Title = song.Title,
                 GenreId = song.GenreId,
-                Genres = await _musicRepository.GetAllGenresAsync()
+                Genres = await _musicService.GetAllGenresAsync()
             };
 
             return View(viewModel);
@@ -264,28 +146,12 @@ namespace WebApplication4.Controllers
         {
             if (!ModelState.IsValid)
             {
-                Console.WriteLine("ModelState недействителен:");
-                foreach (var key in ModelState.Keys)
-                {
-                    var state = ModelState[key];
-                    foreach (var error in state.Errors)
-                    {
-                        Console.WriteLine($"{key}: {error.ErrorMessage}");
-                    }
-                }
-
-                model.Genres = await _musicRepository.GetAllGenresAsync();
+                model.Genres = await _musicService.GetAllGenresAsync();
                 return View(model);
             }
 
-            var song = await _musicRepository.GetSongByIdAsync(model.Id);
-            if (song == null)
-            {
-                return NotFound();
-            }
-
-            song.Title = model.Title;
-            song.GenreId = model.GenreId;
+            var song = await _musicService.GetSongByIdAsync(model.Id);
+            if (song == null) return NotFound();
 
             if (model.File != null && model.File.Length > 0)
             {
@@ -307,11 +173,12 @@ namespace WebApplication4.Controllers
                 song.FilePath = "/uploads/" + fileName;
             }
 
-            await _musicRepository.UpdateSongAsync(song);
+            song.Title = model.Title;
+            song.GenreId = model.GenreId ?? 0;
+
+            await _musicService.UpdateSongAsync(song);
             TempData["SuccessMessage"] = "Песня успешно обновлена!";
             return RedirectToAction("Index");
         }
-
-
     }
 }

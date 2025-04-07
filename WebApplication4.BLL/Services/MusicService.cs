@@ -83,5 +83,29 @@ namespace WebApplication4.BLL.Services
                 GenreId = song.GenreId
             };
         }
+
+        public async Task AddSongAsync(SongDTO songDto)
+        {
+            var song = new Song
+            {
+                Title = songDto.Title,
+                GenreId = songDto.GenreId,
+                FilePath = songDto.FilePath,
+                UserId = songDto.UserId
+            };
+
+            await _musicRepository.AddSongAsync(song);
+        }
+
+        public async Task<List<GenreDTO>> GetAllGenresAsync()
+        {
+            var genres = await _musicRepository.GetAllGenresAsync();
+            return genres.Select(g => new GenreDTO
+            {
+                Id = g.Id,
+                Name = g.Name
+            }).ToList();
+        }
+
     }
 }

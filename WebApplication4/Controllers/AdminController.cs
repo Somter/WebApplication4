@@ -1,38 +1,33 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Linq;
-using WebApplication4.Models;
+using WebApplication4.BLL.DTO;
+using WebApplication4.BLL.Interfaces;
 using WebApplication4.ViewModels;
-using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
-using WebApplication4.Repository;
 
 namespace WebApplication4.Controllers
 {
     public class AdminController : Controller
     {
-        private readonly IUserRepository _userRepository;
-        private readonly IAdminRepository _adminRepository;
+        private readonly IUserService _userService;
+        private readonly IAdminService _adminService;
 
-        public AdminController(IUserRepository userRepository, IAdminRepository adminRepository)
+        public AdminController(IUserService userService, IAdminService adminService)
         {
-            _userRepository = userRepository;
-            _adminRepository = adminRepository;
+            _userService = userService;
+            _adminService = adminService;
         }
-
         public async Task<IActionResult> Index()
         {
-            try
+            var users = await _userService.GetAllUsersAsync(); 
+
+            var viewModel = users.Select(user => new UserDisplayViewModel
             {
-                var users = await _userRepository.GetAllUsersAsync();
-                return View(users);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Ошибка при загрузке пользователей: {ex.Message}");
-                TempData["ErrorMessage"] = "Ошибка при загрузке списка пользователей.";
-                return RedirectToAction("Index");
-            }
+                Id = user.Id,
+                Username = user.Username,
+                Email = user.Email,
+                IsActive = user.IsActive
+            }).ToList();
+
+            return View(viewModel);
         }
 
         public IActionResult Login()
@@ -46,12 +41,10 @@ namespace WebApplication4.Controllers
             try
             {
                 if (!ModelState.IsValid)
-                {
                     return View(model);
-                }
 
-                var admin = await _adminRepository.GetAdminByUsernameAsync(model.Username);
-                if (admin == null || admin.PasswordHash != model.Password)
+                var admin = await _adminService.AuthenticateAdminAsync(model.Username, model.Password);
+                if (admin == null)
                 {
                     model.ErrorMessage = "Неверное имя или пароль";
                     return View(model);
@@ -72,13 +65,11 @@ namespace WebApplication4.Controllers
         {
             try
             {
-                var user = await _userRepository.GetUserByIdAsync(id);
+                var user = await _userService.GetUserByIdAsync(id);
                 if (user == null)
-                {
                     return NotFound();
-                }
 
-                var editUserViewModel = new EditUserViewModel
+                var model = new EditUserViewModel
                 {
                     Id = user.Id,
                     Username = user.Username,
@@ -86,11 +77,11 @@ namespace WebApplication4.Controllers
                     IsActive = user.IsActive
                 };
 
-                return View(editUserViewModel);
+                return View(model);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Ошибка при загрузке страницы редактирования пользователя: {ex.Message}");
+                Console.WriteLine($"Ошибка при загрузке пользователя: {ex.Message}");
                 TempData["ErrorMessage"] = "Ошибка при загрузке страницы редактирования.";
                 return RedirectToAction("Index");
             }
@@ -99,24 +90,20 @@ namespace WebApplication4.Controllers
         [HttpPost]
         public async Task<IActionResult> EditUser(EditUserViewModel model)
         {
+            if (!ModelState.IsValid)
+                return View(model);
+
             try
             {
-                if (!ModelState.IsValid)
+                var userDto = new UserDTO
                 {
-                    return View(model);
-                }
+                    Id = model.Id,
+                    Username = model.Username,
+                    Email = model.Email,
+                    IsActive = model.IsActive
+                };
 
-                var user = await _userRepository.GetUserByIdAsync(model.Id);
-                if (user == null)
-                {
-                    return NotFound();
-                }
-
-                user.Username = model.Username;
-                user.Email = model.Email;
-                user.IsActive = model.IsActive;
-
-                await _userRepository.UpdateUserAsync(user);
+                await _userService.UpdateUserAsync(userDto);
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
@@ -132,8 +119,8 @@ namespace WebApplication4.Controllers
         {
             try
             {
-                await _userRepository.ToggleUserStatusAsync(id);  
-                return RedirectToAction("Index"); 
+                await _userService.ToggleUserStatusAsync(id);
+                return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
@@ -148,12 +135,7 @@ namespace WebApplication4.Controllers
         {
             try
             {
-                var user = await _userRepository.GetUserByIdAsync(id);
-                if (user != null)
-                {
-                    await _userRepository.DeleteUserAsync(user); 
-                }
-
+                await _userService.DeleteUserAsync(id);
                 return RedirectToAction("Index");
             }
             catch (Exception ex)

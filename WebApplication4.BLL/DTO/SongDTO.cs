@@ -26,6 +26,6 @@ namespace WebApplication4.BLL.DTO
 
         [ForeignKey("Genre")]
         public int? GenreId { get; set; }
-        //public Genre? Genre { get; set; }
+        public Genre? Genre { get; set; }
     }
 }

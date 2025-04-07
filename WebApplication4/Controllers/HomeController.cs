@@ -1,21 +1,21 @@
 using Microsoft.AspNetCore.Mvc;
 using WebApplication4.Models;
-using System.Linq;
 using System.Diagnostics;
-using Microsoft.EntityFrameworkCore;
-using WebApplication4.Repository;
+using WebApplication4.BLL.Interfaces;
+using WebApplication4.BLL.DTO;
+using WebApplication4.ViewModels;
 
 namespace WebApplication4.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly IMusicRepository _musicRepository;
-        private readonly IUserRepository _userRepository;
+        private readonly IMusicService _musicService;
+        private readonly IUserService _userService;
 
-        public HomeController(IMusicRepository musicRepository, IUserRepository userRepository)
+        public HomeController(IMusicService musicService, IUserService userService)
         {
-            _musicRepository = musicRepository;
-            _userRepository = userRepository;
+            _musicService = musicService;
+            _userService = userService;
         }
 
         public async Task<IActionResult> Index()
@@ -24,16 +24,29 @@ namespace WebApplication4.Controllers
             {
                 int? userId = HttpContext.Session.GetInt32("UserId");
 
-                var songs = await _musicRepository.GetAllSongsWithGenresAsync();
+                var songs = await _musicService.GetAllSongsAsync();
                 ViewBag.Songs = songs;
 
-                User? user = null;
+                UserDTO? userDTO = null;
+                List<UserDisplayViewModel> userViewModels = new List<UserDisplayViewModel>();
+
                 if (userId != null)
                 {
-                    user = await _userRepository.GetUserByIdAsync(userId.Value);
+                    // Получаем пользователя
+                    userDTO = await _userService.GetUserByIdAsync(userId.Value);
+
+                    // Преобразуем UserDTO в UserDisplayViewModel
+                    userViewModels.Add(new UserDisplayViewModel
+                    {
+                        Id = userDTO.Id,
+                        Username = userDTO.Username,
+                        Email = userDTO.Email,
+                        IsActive = userDTO.IsActive
+                    });
                 }
 
-                return View(user);
+                // Передаем в представление список пользователей
+                return View(userViewModels); 
             }
             catch (Exception ex)
             {
@@ -42,6 +55,8 @@ namespace WebApplication4.Controllers
                 return RedirectToAction("Error");
             }
         }
+
+
 
         public IActionResult Privacy()
         {

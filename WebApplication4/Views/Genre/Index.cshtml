@@ -1,4 +1,4 @@
-﻿@model List<WebApplication4.Models.Genre>
+﻿@model List<WebApplication4.BLL.DTO.GenreDTO>
 
 @{
     ViewData["Title"] = "Жанры";
@@ -54,10 +54,10 @@
         margin: 0; 
     }
 
-        .top-bar-btn:hover {
-            background-color: #e07b00;
-            color: #121212 !important;
-        }
+    .top-bar-btn:hover {
+        background-color: #e07b00;
+        color: #121212 !important;
+    }
 
     .page-title {
         font-size: 28px;
@@ -78,15 +78,15 @@
         color: white;
         padding: 20px;
         border-radius: 10px;
-        width: 320px; /* Увеличил ширину карточки */
+        width: 320px; 
         text-align: center;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         transition: transform 0.3s;
     }
 
-        .genre-card h3 {
-            margin-bottom: 10px;
-        }
+    .genre-card h3 {
+        margin-bottom: 10px;
+    }
 
     .btn-group {
         display: flex;
@@ -112,17 +112,17 @@
         background: #3498db;
     }
 
-        .btn-edit:hover {
-            background: #2980b9;
-        }
+    .btn-edit:hover {
+        background: #2980b9;
+    }
 
     .btn-delete {
         background: #e74c3c;
     }
 
-        .btn-delete:hover {
-            background: #c0392b;
-        }
+    .btn-delete:hover {
+        background: #c0392b;
+    }
 
     .genre-card:hover {
         transform: scale(1.05);

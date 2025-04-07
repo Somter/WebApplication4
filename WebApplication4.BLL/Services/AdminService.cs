@@ -23,15 +23,16 @@ namespace WebApplication4.BLL.Services
         public async Task<AdminDTO?> AuthenticateAdminAsync(string username, string password)
         {
             var admin = await _adminRepository.GetAdminByUsernameAsync(username);
-            if (admin == null || !PasswordHasher.Verify(password, admin.PasswordHash))
+            if (admin == null || admin.PasswordHash != password)  
                 return null;
 
             return new AdminDTO
             {
                 Id = admin.Id,
                 Username = admin.Username,
-                PasswordHash = admin.PasswordHash
+                PasswordHash = admin.PasswordHash  
             };
         }
+
     }
 }

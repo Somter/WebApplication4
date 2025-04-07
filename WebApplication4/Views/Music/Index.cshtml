@@ -1,4 +1,4 @@
-﻿@model List<WebApplication4.Models.Song>
+﻿@model List<WebApplication4.BLL.DTO.SongDTO>
 
 @{
     ViewData["Title"] = "Музыкальная панель";
@@ -19,7 +19,6 @@
             <th>ID</th>
             <th>Название</th>
             <th>Жанр</th>
-           
             <th>Пользователь</th>
             <th>Скачать</th>
             <th>Редактировать</th>
@@ -32,8 +31,7 @@
             <tr>
                 <td class="text-white">@song.Id</td>
                 <td class="text-white">@song.Title</td>
-                <td class="text-white">@song.Genre.Name</td>
-                
+                <td class="text-white">@song.Genre?.Name</td>
                 <td class="text-white">@song.UserId</td>
                 <td>
                     <a href="@Url.Action("Download", "Music", new { fileName = song.FilePath.Split('/').Last() })"
@@ -59,5 +57,5 @@
 
 <nav class="nav-links" style="margin-top: 30px;">
     <a href="@Url.Action("Index", "Genre")" class="btn btn-logout">Жанры</a>
-    <a href="@Url.Action("UploadAdmin", "Music")" class="btn btn-logout">Загрузить музыку</a> 
+    <a href="@Url.Action("UploadAdmin", "Music")" class="btn btn-logout">Загрузить музыку</a>
 </nav>

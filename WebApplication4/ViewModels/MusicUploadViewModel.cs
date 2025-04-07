@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using WebApplication4.BLL.DTO; 
 using WebApplication4.Models;
 
 namespace WebApplication4.ViewModels
@@ -15,6 +16,6 @@ namespace WebApplication4.ViewModels
 
         public IFormFile? File { get; set; }
 
-        public List<Genre>? Genres { get; set; }
+        public List<GenreDTO>? Genres { get; set; }
     }
 }

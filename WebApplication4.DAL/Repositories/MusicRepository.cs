@@ -69,6 +69,11 @@ namespace WebApplication4.DAL.Repositories
                                  .Include(s => s.Genre)
                                  .FirstOrDefaultAsync(s => s.Id == songId);
         }
+        public async Task AddSongAsync(Song song)
+        {
+            _context.Songs.Add(song);
+            await _context.SaveChangesAsync();
+        }
     }
 
 }

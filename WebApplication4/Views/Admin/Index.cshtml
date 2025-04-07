@@ -1,4 +1,4 @@
-﻿@model List<WebApplication4.Models.User>
+﻿@model List<WebApplication4.ViewModels.UserDisplayViewModel>
 
 @{
     ViewData["Title"] = "Admin Panel";
@@ -55,8 +55,6 @@
                         <button class="btn-secondary" style="width: 100%" disabled>Активен</button>
                     }
                 </td>
-
-
 
                 <td>
                     <a asp-action="EditUser" asp-controller="Admin" asp-route-id="@user.Id"
