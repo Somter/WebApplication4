@@ -22,8 +22,22 @@ namespace WebApplication4.BLL.Services
         public async Task<List<SongDTO>> GetAllSongsAsync()
         {
             var songs = await _musicRepository.GetAllSongsWithGenresAsync();
-            return songs.Select(MapToDTO).ToList();
+
+            return songs.Select(s => new SongDTO
+            {
+                Id = s.Id,
+                Title = s.Title,
+                GenreId = s.GenreId ?? 0, 
+                Genre = new GenreDTO
+                {
+                    Id = s.Genre?.Id ?? 0,
+                    Name = s.Genre?.Name
+                },
+                FilePath = s.FilePath,
+                UserId = s.UserId
+            }).ToList();
         }
+
 
         public async Task<SongDTO?> GetSongByIdAsync(int id)
         {

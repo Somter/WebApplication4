@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using WebApplication4.ViewModels;
 using WebApplication4.BLL.Interfaces;
 using WebApplication4.BLL.DTO;
+using WebApplication4.BLL.Services;
 
 namespace WebApplication4.Controllers
 {
@@ -10,20 +11,47 @@ namespace WebApplication4.Controllers
     {
         private readonly IMusicService _musicService;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IGenreService _genreService;
 
-        public MusicController(IMusicService musicService, IWebHostEnvironment webHostEnvironment)
+        public MusicController(IMusicService musicService, IWebHostEnvironment webHostEnvironment, IGenreService genreService)
         {
             _musicService = musicService;
             _webHostEnvironment = webHostEnvironment;
+            _genreService = genreService;  
         }
 
+
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
+            const int pageSize = 3;
+
             try
             {
-                var songs = await _musicService.GetAllSongsAsync();
-                return View(songs);
+                var allSongs = await _musicService.GetAllSongsAsync();
+                var totalSongs = allSongs.Count();
+                var totalPages = (int)Math.Ceiling(totalSongs / (double)pageSize);
+
+                var songsToShow = allSongs
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList();
+
+                var viewModel = new AdminSongsListViewModel
+                {
+                    Songs = songsToShow.Select(song => new AdminSongsViewModel
+                    {
+                        Id = song.Id,
+                        Title = song.Title,
+                        GenreName = song.Genre?.Name,
+                        UserId = song.UserId,
+                        FilePath = song.FilePath
+                    }).ToList(),
+                    CurrentPage = page,
+                    TotalPages = totalPages
+                };
+
+                return View(viewModel);
             }
             catch (Exception ex)
             {
@@ -33,15 +61,18 @@ namespace WebApplication4.Controllers
             }
         }
 
+
         [HttpGet]
-        public async Task<IActionResult> Upload()
+        public IActionResult Upload()
         {
+            var genres = _genreService.GetAllGenres();
             var model = new MusicUploadViewModel
             {
-                Genres = await _musicService.GetAllGenresAsync()
+                Genres = genres.Select(g => new GenreDTO { Id = g.Id, Name = g.Name }).ToList()
             };
             return View(model);
         }
+
 
         [HttpPost]
         public async Task<IActionResult> Upload(MusicUploadViewModel model)
@@ -71,7 +102,7 @@ namespace WebApplication4.Controllers
             var songDto = new SongDTO
             {
                 Title = model.Title,
-                GenreId = model.GenreId ?? 0,
+                GenreId = model.GenreId ?? 0,  
                 FilePath = "/uploads/" + fileName,
                 UserId = userId
             };

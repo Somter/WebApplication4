@@ -22,10 +22,10 @@ namespace WebApplication4.BLL.DTO
 
         [ForeignKey("User")]
         public int? UserId { get; set; }
-        //public User? User { get; set; }
 
         [ForeignKey("Genre")]
         public int? GenreId { get; set; }
-        public Genre? Genre { get; set; }
+        public GenreDTO Genre { get; set; }
     }
+
 }

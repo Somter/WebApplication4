@@ -38,7 +38,7 @@
             <option value="">Выберите жанр...</option>
             @foreach (var genre in Model.Genres)
             {
-                <option value="@genre.Id">@genre.Name</option>
+                <option value="@genre.Id" selected="@(genre.Id == Model.GenreId ? "selected" : "")">@genre.Name</option>
             }
         </select>
     </div>

@@ -37,13 +37,39 @@
 <div class="container">
     <h2>Список песен</h2>
 
+    <form method="get" asp-action="Index">
+        <div class="form-group">
+            <input type="text" name="search" placeholder="Поиск по названию" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <select name="sortOrder" class="form-control">
+                <option value="Title">Сортировать по названию</option>
+                <option value="Genre">Сортировать по жанру</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <select name="genreId" class="form-control">
+                <option value="">Все жанры</option>
+                @foreach (var genre in ViewBag.Genres as List<WebApplication4.BLL.DTO.GenreDTO>)
+                {
+                    <option value="@genre.Id">@genre.Name</option>
+                }
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Поиск</button>
+    </form>
+
+
     @if (ViewBag.Songs != null && ((List<WebApplication4.BLL.DTO.SongDTO>)ViewBag.Songs).Any())
     {
         <ul>
             @foreach (var song in (List<WebApplication4.BLL.DTO.SongDTO>)ViewBag.Songs)
             {
                 <li>
-                    <strong>@song.Title</strong> - @song.Genre?.Name    
+                    <strong>@song.Title</strong> - @(song.Genre?.Name ?? "Без жанра")
                     <br />
                     <audio controls>
                         <source src="@Url.Content(song.FilePath)" type="audio/mpeg" />

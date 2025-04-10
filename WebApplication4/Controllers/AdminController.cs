@@ -15,17 +15,30 @@ namespace WebApplication4.Controllers
             _userService = userService;
             _adminService = adminService;
         }
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
-            var users = await _userService.GetAllUsersAsync(); 
+            int pageSize = 4;
+            var users = await _userService.GetAllUsersAsync();
 
-            var viewModel = users.Select(user => new UserDisplayViewModel
+            var userViewModels = users.Select(user => new UserDisplayViewModel
             {
                 Id = user.Id,
                 Username = user.Username,
                 Email = user.Email,
                 IsActive = user.IsActive
             }).ToList();
+
+            var pagedUsers = userViewModels
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            var viewModel = new AdminUserListViewModel
+            {
+                Users = pagedUsers,
+                CurrentPage = page,
+                TotalPages = (int)Math.Ceiling(userViewModels.Count / (double)pageSize)
+            };
 
             return View(viewModel);
         }

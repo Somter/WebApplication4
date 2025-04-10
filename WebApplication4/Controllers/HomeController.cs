@@ -18,24 +18,47 @@ namespace WebApplication4.Controllers
             _userService = userService;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string search, string sortOrder, int? genreId)
         {
             try
             {
                 int? userId = HttpContext.Session.GetInt32("UserId");
 
                 var songs = await _musicService.GetAllSongsAsync();
+
+                if (!string.IsNullOrEmpty(search))
+                {
+                    songs = songs.Where(s => s.Title.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
+                }
+
+                if (genreId.HasValue && genreId.Value > 0)
+                {
+                    songs = songs.Where(s => s.GenreId == genreId.Value).ToList();
+                }
+
+                switch (sortOrder)
+                {
+                    case "Genre":
+                        songs = songs.OrderBy(s => s.Genre?.Name).ToList();
+                        break;
+                    case "Title":
+                    default:
+                        songs = songs.OrderBy(s => s.Title).ToList();
+                        break;
+                }
+
                 ViewBag.Songs = songs;
+
+                var genres = await _musicService.GetAllGenresAsync();
+                ViewBag.Genres = genres;
 
                 UserDTO? userDTO = null;
                 List<UserDisplayViewModel> userViewModels = new List<UserDisplayViewModel>();
 
                 if (userId != null)
                 {
-                    // Получаем пользователя
                     userDTO = await _userService.GetUserByIdAsync(userId.Value);
 
-                    // Преобразуем UserDTO в UserDisplayViewModel
                     userViewModels.Add(new UserDisplayViewModel
                     {
                         Id = userDTO.Id,
@@ -45,8 +68,7 @@ namespace WebApplication4.Controllers
                     });
                 }
 
-                // Передаем в представление список пользователей
-                return View(userViewModels); 
+                return View(userViewModels);
             }
             catch (Exception ex)
             {
@@ -86,4 +108,5 @@ namespace WebApplication4.Controllers
             }
         }
     }
+
 }
