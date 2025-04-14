@@ -1,5 +1,7 @@
 /*Admin css: */
 /* —брос стилей по умолчанию */
+@import url("https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap");
+
 * {
     margin: 0;
     padding: 0;
@@ -390,3 +392,4 @@ h2 {
         background-color: #e07b00; 
         text-decoration: none; 
     }
+

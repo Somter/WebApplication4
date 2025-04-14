@@ -1,4 +1,4 @@
-﻿@model List<WebApplication4.ViewModels.UserDisplayViewModel>
+﻿@model WebApplication4.ViewModels.SongFilterViewModel
 
 @{
     ViewData["Title"] = "Home Page";
@@ -8,7 +8,7 @@
     <div class="logo">SashaMusic</div>
 
     <div>
-        @if (Model != null && Model.Any() && Model.FirstOrDefault()?.IsActive == true)
+        @if (Model.Users != null && Model.Users.Any() && Model.Users.FirstOrDefault()?.IsActive == true)
         {
             <a asp-action="Upload" asp-controller="Music"
                style="background-color: #ff8c00; color: black; padding: 10px 15px; text-decoration: none; border-radius: 5px; margin-right: 10px;">
@@ -33,47 +33,48 @@
     </div>
 </div>
 
-<div style="margin-top: 15px;">
-    <h2>Список песен</h2>
 
-    <form method="get" asp-action="Index">
+    <div style="margin-top: 15px;">
+        <h2>Список песен</h2>
+    <form asp-action="Index" method="get" style="max-width: 800px; margin: 0 auto;">
         <div class="form-group">
-            <input type="text" name="search" placeholder="Поиск по названию" class="form-control" />
+            <input asp-for="Search" name="search" class="form-control" placeholder="Поиск по названию" style="width: 100%;" />
         </div>
 
         <div class="form-group">
-            <select name="sortOrder" class="form-control">
+            <select asp-for="SortOrder" name="sortOrder" class="form-control" style="width: 100%;">
                 <option value="Title">Сортировать по названию</option>
                 <option value="Genre">Сортировать по жанру</option>
             </select>
         </div>
 
         <div class="form-group">
-            <select name="genreId" class="form-control">
+            <select asp-for="GenreId" name="genreId" class="form-control" style="width: 100%;">
                 <option value="">Все жанры</option>
-                @foreach (var genre in ViewBag.Genres as List<WebApplication4.BLL.DTO.GenreDTO>)
+                @foreach (var genre in Model.Genres)
                 {
                     <option value="@genre.Id">@genre.Name</option>
                 }
             </select>
         </div>
 
-        <button type="submit" class="btn btn-primary">Поиск</button>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Поиск</button>
     </form>
 
-
-    @if (ViewBag.Songs != null && ((List<WebApplication4.BLL.DTO.SongDTO>)ViewBag.Songs).Any())
+    @if (Model.Songs != null && Model.Songs.Any())
     {
         <ul>
-            @foreach (var song in (List<WebApplication4.BLL.DTO.SongDTO>)ViewBag.Songs)
+            @foreach (var song in Model.Songs)
             {
                 <li>
                     <strong>@song.Title</strong> - @(song.Genre?.Name ?? "Без жанра")
                     <br />
-                    <audio controls>
-                        <source src="@Url.Content(song.FilePath)" type="audio/mpeg" />
-                        Ваш браузер не поддерживает элемент audio.
-                    </audio>
+                    <div class="audio-player">
+                        <audio controls>
+                            <source src="@Url.Content(song.FilePath)" type="audio/mpeg" />
+                            Ваш браузер не поддерживает элемент audio.
+                        </audio>
+                    </div>
                 </li>
             }
         </ul>
@@ -82,4 +83,6 @@
     {
         <p>Нет доступных песен.</p>
     }
+
+
 </div>

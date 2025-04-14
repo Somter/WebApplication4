@@ -20,64 +20,47 @@ namespace WebApplication4.Controllers
 
         public async Task<IActionResult> Index(string search, string sortOrder, int? genreId)
         {
-            try
+            var songs = await _musicService.GetAllSongsAsync();
+
+            if (!string.IsNullOrWhiteSpace(search))
+                songs = songs.Where(s => s.Title.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
+
+            if (genreId.HasValue && genreId.Value > 0)
+                songs = songs.Where(s => s.GenreId == genreId.Value).ToList();
+
+            songs = sortOrder switch
             {
-                int? userId = HttpContext.Session.GetInt32("UserId");
+                "Genre" => songs.OrderBy(s => s.Genre?.Name).ToList(),
+                _ => songs.OrderBy(s => s.Title).ToList()
+            };
 
-                var songs = await _musicService.GetAllSongsAsync();
+            var genres = await _musicService.GetAllGenresAsync();
 
-                if (!string.IsNullOrEmpty(search))
-                {
-                    songs = songs.Where(s => s.Title.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
-                }
-
-                if (genreId.HasValue && genreId.Value > 0)
-                {
-                    songs = songs.Where(s => s.GenreId == genreId.Value).ToList();
-                }
-
-                switch (sortOrder)
-                {
-                    case "Genre":
-                        songs = songs.OrderBy(s => s.Genre?.Name).ToList();
-                        break;
-                    case "Title":
-                    default:
-                        songs = songs.OrderBy(s => s.Title).ToList();
-                        break;
-                }
-
-                ViewBag.Songs = songs;
-
-                var genres = await _musicService.GetAllGenresAsync();
-                ViewBag.Genres = genres;
-
-                UserDTO? userDTO = null;
-                List<UserDisplayViewModel> userViewModels = new List<UserDisplayViewModel>();
-
-                if (userId != null)
-                {
-                    userDTO = await _userService.GetUserByIdAsync(userId.Value);
-
-                    userViewModels.Add(new UserDisplayViewModel
-                    {
-                        Id = userDTO.Id,
-                        Username = userDTO.Username,
-                        Email = userDTO.Email,
-                        IsActive = userDTO.IsActive
-                    });
-                }
-
-                return View(userViewModels);
-            }
-            catch (Exception ex)
+            var filterModel = new SongFilterViewModel
             {
-                Console.WriteLine($"Ошибка при загрузке главной страницы: {ex.Message}");
-                TempData["ErrorMessage"] = "Ошибка при загрузке страницы.";
-                return RedirectToAction("Error");
+                Search = search,
+                SortOrder = sortOrder,
+                GenreId = genreId,
+                Songs = songs,
+                Genres = genres,
+                Users = new List<UserDisplayViewModel>()
+            };
+
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId.HasValue)
+            {
+                var user = await _userService.GetUserByIdAsync(userId.Value);
+                filterModel.Users.Add(new UserDisplayViewModel
+                {
+                    Id = user.Id,
+                    Username = user.Username,
+                    Email = user.Email,
+                    IsActive = user.IsActive
+                });
             }
+
+            return View(filterModel);
         }
-
 
 
         public IActionResult Privacy()
