@@ -1,3 +1,6 @@
+using Microsoft.AspNetCore.Localization;
+using System.Globalization;
+using Microsoft.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
 using WebApplication4.Models;
 using WebApplication4.DAL.EF;
@@ -6,9 +9,36 @@ using WebApplication4.BLL.Services;
 using WebApplication4.DAL.Interfaces;
 using WebApplication4.DAL.Repositories;
 using WebApplication4.DAL.Entities;
-using WWebApplication4.DAL.Repositories; 
+using WWebApplication4.DAL.Repositories;
+using WebApplication4.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Подключаем локализацию
+builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    var supportedCultures = new[]
+    {
+        new CultureInfo("ru"),
+        new CultureInfo("en"),
+        new CultureInfo("ja"),
+        new CultureInfo("es"),
+        new CultureInfo("ro")
+    };
+
+    options.DefaultRequestCulture = new RequestCulture("ru");
+    options.SupportedCultures = supportedCultures;
+    options.SupportedUICultures = supportedCultures;
+});
+
+// Підключаємо MVC + локалізація в DataAnnotations + Views
+builder.Services.AddControllersWithViews(options =>
+{
+    options.Filters.Add(typeof(CultureFilter));
+})
+.AddViewLocalization()
+.AddDataAnnotationsLocalization();
 
 // Сервисы BLL
 builder.Services.AddScoped<IUserService, UserService>();

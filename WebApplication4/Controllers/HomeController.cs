@@ -11,7 +11,6 @@ namespace WebApplication4.Controllers
     {
         private readonly IMusicService _musicService;
         private readonly IUserService _userService;
-
         public HomeController(IMusicService musicService, IUserService userService)
         {
             _musicService = musicService;
