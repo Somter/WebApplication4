@@ -1,45 +1,41 @@
-﻿@model WebApplication4.ViewModels.RegisterViewModel
+﻿@using WebApplication4.Resources;
+@model WebApplication4.ViewModels.RegisterViewModel
 
 @{
     ViewData["Title"] = "Register";
 }
 
-<h2>Регистрация</h2>
-
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
-}
+<h2>@Resource.Register</h2>
 
 <form method="post" asp-action="Register" id="registerForm">
     <div class="form-group">
-        <label asp-for="Username" class="control-label">Логин</label>
+        <label asp-for="Username" class="control-label">@Resource.UsernameLabel</label> 
         <input asp-for="Username" class="form-control" />
         <span asp-validation-for="Username" class="text-danger"></span>
     </div>
 
     <div class="form-group">
-        <label asp-for="Password" class="control-label">Пароль</label>
+        <label asp-for="Password" class="control-label">@Resource.PasswordLabel</label>
         <input asp-for="Password" type="password" class="form-control" />
         <span asp-validation-for="Password" class="text-danger"></span>
     </div>
 
     <div class="form-group">
-        <label asp-for="ConfirmPassword" class="control-label">Подтвердите пароль</label>
+        <label asp-for="ConfirmPassword" class="control-label">@Resource.ConfirmPasswordLabel_</label>
         <input asp-for="ConfirmPassword" type="password" class="form-control" />
         <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
     </div>
 
     <div class="form-group">
-        <label asp-for="Email" class="control-label">Email</label>
+        <label asp-for="Email" class="control-label">@Resource.EmailLabel_</label>
         <input asp-for="Email" type="email" class="form-control" />
         <span asp-validation-for="Email" class="text-danger"></span>
     </div>
 
-    <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
+    <button type="submit" class="btn btn-primary">@Resource.RegisterButton</button>
 </form>
 
-<p>Уже есть аккаунт? <a asp-controller="Regist" asp-action="Login">Войти</a></p>
+<p>@Resource.AlreadyHaveAccount_ <a asp-controller="Regist" asp-action="Login">@Resource.LoginLinkText_</a></p>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

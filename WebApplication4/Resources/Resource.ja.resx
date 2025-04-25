@@ -153,4 +153,52 @@
   <data name="AllGenres" xml:space="preserve">
     <value>全ジャンル</value>
   </data>
+  <data name="UsernameLabel" xml:space="preserve">
+    <value>ユーザー名 </value>
+  </data>
+  <data name="PasswordLabel" xml:space="preserve">
+    <value>パスワード</value>
+  </data>
+  <data name="ConfirmPasswordLabel " xml:space="preserve">
+    <value>パスワードの確認</value>
+  </data>
+  <data name="EmailLabel " xml:space="preserve">
+    <value>メールアドレス </value>
+  </data>
+  <data name="RegisterButton" xml:space="preserve">
+    <value>登録する </value>
+  </data>
+  <data name="AlreadyHaveAccount " xml:space="preserve">
+    <value>すでにアカウントをお持ちですか？</value>
+  </data>
+  <data name="LoginLinkText " xml:space="preserve">
+    <value>ログイン</value>
+  </data>
+  <data name="UsernameLength" xml:space="preserve">
+    <value>ユーザー名は3〜20文字でなければなりません</value>
+  </data>
+  <data name="PasswordRequired" xml:space="preserve">
+    <value>パスワードを入力してください</value>
+  </data>
+  <data name="PasswordLength" xml:space="preserve">
+    <value>パスワードは6文字以上でなければなりません</value>
+  </data>
+  <data name="PasswordStrength " xml:space="preserve">
+    <value>パスワードには、少なくとも1つの大文字、数字、特殊文字が含まれている必要があります</value>
+  </data>
+  <data name="ConfirmPasswordRequired " xml:space="preserve">
+    <value>パスワードを確認してください</value>
+  </data>
+  <data name="ConfirmPasswordMismatch" xml:space="preserve">
+    <value>パスワードが一致しません</value>
+  </data>
+  <data name="EmailRequired" xml:space="preserve">
+    <value>メールアドレスを入力してください</value>
+  </data>
+  <data name="EmailInvalid" xml:space="preserve">
+    <value>無効なメール形式です</value>
+  </data>
+  <data name="UserrnameRequired" xml:space="preserve">
+    <value>ユーザー名を入力してください</value>
+  </data>
 </root>

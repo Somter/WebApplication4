@@ -153,4 +153,52 @@
   <data name="AllGenres" xml:space="preserve">
     <value>Все жанры</value>
   </data>
+  <data name="UsernameLabel" xml:space="preserve">
+    <value>Логин</value>
+  </data>
+  <data name="PasswordLabel" xml:space="preserve">
+    <value>Пароль</value>
+  </data>
+  <data name="ConfirmPasswordLabel " xml:space="preserve">
+    <value>Подтвердите пароль </value>
+  </data>
+  <data name="EmailLabel " xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="RegisterButton" xml:space="preserve">
+    <value>Зарегистрироваться</value>
+  </data>
+  <data name="AlreadyHaveAccount " xml:space="preserve">
+    <value>Уже есть аккаунт? </value>
+  </data>
+  <data name="LoginLinkText " xml:space="preserve">
+    <value>Войти</value>
+  </data>
+  <data name="UsernameLength" xml:space="preserve">
+    <value>Имя пользователя должно содержать от 3 до 20 символов </value>
+  </data>
+  <data name="PasswordRequired" xml:space="preserve">
+    <value>Введите пароль</value>
+  </data>
+  <data name="PasswordLength" xml:space="preserve">
+    <value>Пароль должен содержать минимум 6 символов</value>
+  </data>
+  <data name="PasswordStrength " xml:space="preserve">
+    <value>Пароль должен содержать хотя бы одну заглавную букву, цифру и специальный символ</value>
+  </data>
+  <data name="ConfirmPasswordRequired " xml:space="preserve">
+    <value>Подтвердите пароль</value>
+  </data>
+  <data name="ConfirmPasswordMismatch" xml:space="preserve">
+    <value>Пароли не совпадают</value>
+  </data>
+  <data name="EmailRequired" xml:space="preserve">
+    <value>Введите email</value>
+  </data>
+  <data name="EmailInvalid" xml:space="preserve">
+    <value>Некорректный формат email</value>
+  </data>
+  <data name="UserrnameRequired" xml:space="preserve">
+    <value>Введите имя пользователя</value>
+  </data>
 </root>

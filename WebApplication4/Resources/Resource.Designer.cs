@@ -79,11 +79,74 @@ namespace WebApplication4.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Уже есть аккаунт? .
+        /// </summary>
+        public static string AlreadyHaveAccount_ {
+            get {
+                return ResourceManager.GetString("AlreadyHaveAccount ", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Ваш браузер не поддерживает элемент audio..
         /// </summary>
         public static string AudioNotSupported {
             get {
                 return ResourceManager.GetString("AudioNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Подтвердите пароль .
+        /// </summary>
+        public static string ConfirmPasswordLabel_ {
+            get {
+                return ResourceManager.GetString("ConfirmPasswordLabel ", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Пароли не совпадают.
+        /// </summary>
+        public static string ConfirmPasswordMismatch {
+            get {
+                return ResourceManager.GetString("ConfirmPasswordMismatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Подтвердите пароль.
+        /// </summary>
+        public static string ConfirmPasswordRequired_ {
+            get {
+                return ResourceManager.GetString("ConfirmPasswordRequired ", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Некорректный формат email.
+        /// </summary>
+        public static string EmailInvalid {
+            get {
+                return ResourceManager.GetString("EmailInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Email.
+        /// </summary>
+        public static string EmailLabel_ {
+            get {
+                return ResourceManager.GetString("EmailLabel ", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Введите email.
+        /// </summary>
+        public static string EmailRequired {
+            get {
+                return ResourceManager.GetString("EmailRequired", resourceCulture);
             }
         }
         
@@ -106,6 +169,15 @@ namespace WebApplication4.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Войти.
+        /// </summary>
+        public static string LoginLinkText_ {
+            get {
+                return ResourceManager.GetString("LoginLinkText ", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Выход.
         /// </summary>
         public static string Logout {
@@ -124,11 +196,56 @@ namespace WebApplication4.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Пароль.
+        /// </summary>
+        public static string PasswordLabel {
+            get {
+                return ResourceManager.GetString("PasswordLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Пароль должен содержать минимум 6 символов.
+        /// </summary>
+        public static string PasswordLength {
+            get {
+                return ResourceManager.GetString("PasswordLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Введите пароль.
+        /// </summary>
+        public static string PasswordRequired {
+            get {
+                return ResourceManager.GetString("PasswordRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Пароль должен содержать хотя бы одну заглавную букву, цифру и специальный символ.
+        /// </summary>
+        public static string PasswordStrength_ {
+            get {
+                return ResourceManager.GetString("PasswordStrength ", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Регистрация.
         /// </summary>
         public static string Register {
             get {
                 return ResourceManager.GetString("Register", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Зарегистрироваться.
+        /// </summary>
+        public static string RegisterButton {
+            get {
+                return ResourceManager.GetString("RegisterButton", resourceCulture);
             }
         }
         
@@ -165,6 +282,33 @@ namespace WebApplication4.Resources {
         public static string TitleSort {
             get {
                 return ResourceManager.GetString("TitleSort", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Логин.
+        /// </summary>
+        public static string UsernameLabel {
+            get {
+                return ResourceManager.GetString("UsernameLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Имя пользователя должно содержать от 3 до 20 символов .
+        /// </summary>
+        public static string UsernameLength {
+            get {
+                return ResourceManager.GetString("UsernameLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Введите имя пользователя.
+        /// </summary>
+        public static string UserrnameRequired {
+            get {
+                return ResourceManager.GetString("UserrnameRequired", resourceCulture);
             }
         }
     }

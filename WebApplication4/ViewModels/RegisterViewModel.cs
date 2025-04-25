@@ -1,26 +1,27 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using WebApplication4.Resources;
 
 namespace WebApplication4.ViewModels
 {
     public class RegisterViewModel
     {
-        [Required(ErrorMessage = "Введите имя пользователя")]
-        [StringLength(20, MinimumLength = 3, ErrorMessage = "Имя пользователя должно содержать от 3 до 20 символов")]
+        [Required(ErrorMessageResourceName = "UserrnameRequired", ErrorMessageResourceType = typeof(Resource))]
+        [StringLength(20, MinimumLength = 3, ErrorMessageResourceName = "UsernameLength", ErrorMessageResourceType = typeof(Resource))]
         public string Username { get; set; }
 
-        [Required(ErrorMessage = "Введите пароль")]
+        [Required(ErrorMessageResourceName = "PasswordRequired", ErrorMessageResourceType = typeof(Resource))]
         [DataType(DataType.Password)]
-        [StringLength(50, MinimumLength = 6, ErrorMessage = "Пароль должен содержать минимум 6 символов")]
-        [RegularExpression(@"^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{6,}$", ErrorMessage = "Пароль должен содержать хотя бы одну заглавную букву, цифру и специальный символ")]
+        [StringLength(50, MinimumLength = 6, ErrorMessageResourceName = "PasswordLength", ErrorMessageResourceType = typeof(Resource))]
+        [RegularExpression(@"^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{6,}$", ErrorMessageResourceName = "PasswordStrength_", ErrorMessageResourceType = typeof(Resource))]
         public string Password { get; set; }
 
-        [Required(ErrorMessage = "Подтвердите пароль")]
-        [Compare("Password", ErrorMessage = "Пароли не совпадают")]
+        [Required(ErrorMessageResourceName = "ConfirmPasswordRequired_", ErrorMessageResourceType = typeof(Resource))]
+        [Compare("Password", ErrorMessageResourceName = "ConfirmPasswordMismatch", ErrorMessageResourceType = typeof(Resource))]
         [DataType(DataType.Password)]
         public string ConfirmPassword { get; set; }
 
-        [Required(ErrorMessage = "Введите email")]
-        [EmailAddress(ErrorMessage = "Некорректный формат email")]
+        [Required(ErrorMessageResourceName = "EmailRequired", ErrorMessageResourceType = typeof(Resource))]
+        [EmailAddress(ErrorMessageResourceName = "EmailInvalid", ErrorMessageResourceType = typeof(Resource))]
         public string Email { get; set; }
 
         public string? ErrorMessage { get; set; }

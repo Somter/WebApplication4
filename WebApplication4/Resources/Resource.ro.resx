@@ -153,4 +153,52 @@
   <data name="AllGenres" xml:space="preserve">
     <value>Toate genurile</value>
   </data>
+  <data name="UsernameLabel" xml:space="preserve">
+    <value>Nume de utilizator</value>
+  </data>
+  <data name="PasswordLabel" xml:space="preserve">
+    <value>Parolă</value>
+  </data>
+  <data name="ConfirmPasswordLabel " xml:space="preserve">
+    <value>Confirmă parola</value>
+  </data>
+  <data name="EmailLabel " xml:space="preserve">
+    <value>E-mail</value>
+  </data>
+  <data name="RegisterButton" xml:space="preserve">
+    <value>Înregistrează-te</value>
+  </data>
+  <data name="AlreadyHaveAccount " xml:space="preserve">
+    <value>Ai deja un cont?</value>
+  </data>
+  <data name="LoginLinkText " xml:space="preserve">
+    <value>Autentificare</value>
+  </data>
+  <data name="UsernameLength" xml:space="preserve">
+    <value>Numele de utilizator trebuie să aibă între 3 și 20 de caractere</value>
+  </data>
+  <data name="PasswordRequired" xml:space="preserve">
+    <value>Introdu parola</value>
+  </data>
+  <data name="PasswordLength" xml:space="preserve">
+    <value>Parola trebuie să aibă cel puțin 6 caractere</value>
+  </data>
+  <data name="PasswordStrength " xml:space="preserve">
+    <value>Parola trebuie să conțină cel puțin o literă mare, o cifră și un caracter special</value>
+  </data>
+  <data name="ConfirmPasswordRequired " xml:space="preserve">
+    <value>Confirmă parola</value>
+  </data>
+  <data name="ConfirmPasswordMismatch" xml:space="preserve">
+    <value>Parolele nu se potrivesc</value>
+  </data>
+  <data name="EmailRequired" xml:space="preserve">
+    <value>Introdu e-mail-ul</value>
+  </data>
+  <data name="EmailInvalid" xml:space="preserve">
+    <value>Format e-mail invalid</value>
+  </data>
+  <data name="UserrnameRequired" xml:space="preserve">
+    <value>Introdu numele de utilizator</value>
+  </data>
 </root>
