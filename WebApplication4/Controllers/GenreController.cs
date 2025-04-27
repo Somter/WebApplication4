@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using WebApplication4.BLL.DTO;
 using WebApplication4.BLL.Interfaces;
 using WebApplication4.ViewModels;
@@ -8,10 +9,12 @@ namespace WebApplication4.Controllers
     public class GenreController : Controller
     {
         private readonly IGenreService _genreService;
+        IHubContext<NotificationHub> hubContext { get; }
 
-        public GenreController(IGenreService genreService)
+        public GenreController(IGenreService genreService, IHubContext<NotificationHub> hub)
         {
             _genreService = genreService;
+            hubContext = hub;
         }
 
         public IActionResult Index()
@@ -29,10 +32,15 @@ namespace WebApplication4.Controllers
             }
         }
 
+        private async Task SendMessage(string message)
+        {
+            await hubContext.Clients.All.SendAsync("displayMessage", message);
+        }
+
         public IActionResult Create() => View();
 
         [HttpPost]
-        public IActionResult Create(GenreCreateViewModel model)
+        public async Task<IActionResult> Create(GenreCreateViewModel model)
         {
             if (!ModelState.IsValid)
                 return View(model);
@@ -51,7 +59,7 @@ namespace WebApplication4.Controllers
                 };
 
                 _genreService.AddGenre(genreDto);
-
+                await SendMessage("Добавлен новый жанр: " + model.Name);
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
@@ -86,7 +94,7 @@ namespace WebApplication4.Controllers
         }
 
         [HttpPost]
-        public IActionResult Edit(GenreEditViewModel model)
+        public async Task<IActionResult> Edit(GenreEditViewModel model)
         {
             if (!ModelState.IsValid)
                 return View(model);
@@ -100,7 +108,7 @@ namespace WebApplication4.Controllers
                 };
 
                 _genreService.UpdateGenre(genreDto);
-
+                await SendMessage("Жанр: " + genreDto.Name + " отредактирован");
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
@@ -129,10 +137,12 @@ namespace WebApplication4.Controllers
         }
 
         [HttpPost]
-        public IActionResult DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
             try
             {
+                var gh = _genreService.GetGenreById(id);
+                await SendMessage("Жанр " + gh.Name + " удалён");
                 _genreService.DeleteGenre(id);
                 return RedirectToAction("Index");
             }

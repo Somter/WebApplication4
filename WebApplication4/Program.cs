@@ -11,8 +11,11 @@ using WebApplication4.DAL.Repositories;
 using WebApplication4.DAL.Entities;
 using WWebApplication4.DAL.Repositories;
 using WebApplication4.Filters;
+using WebApplication4;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddSignalR();
 
 // Подключаем локализацию
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
@@ -107,5 +110,7 @@ using (var scope = app.Services.CreateScope())
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.MapHub<NotificationHub>("/notification");  
 
 app.Run();

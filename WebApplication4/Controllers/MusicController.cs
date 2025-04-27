@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using WebApplication4.ViewModels;
+using Microsoft.AspNetCore.SignalR;
 using WebApplication4.BLL.Interfaces;
 using WebApplication4.BLL.DTO;
 using WebApplication4.BLL.Services;
+using WebApplication4.DAL.Entities;
 
 namespace WebApplication4.Controllers
 {
@@ -12,12 +14,14 @@ namespace WebApplication4.Controllers
         private readonly IMusicService _musicService;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IGenreService _genreService;
+        IHubContext<NotificationHub> hubContext { get; }
 
-        public MusicController(IMusicService musicService, IWebHostEnvironment webHostEnvironment, IGenreService genreService)
+        public MusicController(IMusicService musicService, IWebHostEnvironment webHostEnvironment, IGenreService genreService, IHubContext<NotificationHub> hub)
         {
             _musicService = musicService;
             _webHostEnvironment = webHostEnvironment;
-            _genreService = genreService;  
+            _genreService = genreService;
+            hubContext = hub;
         }
 
 
@@ -61,6 +65,10 @@ namespace WebApplication4.Controllers
             }
         }
 
+        private async Task SendMessage(string message)
+        {
+            await hubContext.Clients.All.SendAsync("displayMessage", message);
+        }
 
         [HttpGet]
         public IActionResult Upload()
@@ -108,7 +116,7 @@ namespace WebApplication4.Controllers
             };
 
             await _musicService.AddSongAsync(songDto);
-            TempData["SuccessMessage"] = "Песня успешно загружена!";
+            await SendMessage("Добавлена новая музыка: " + model.Title);
             return RedirectToAction("Upload");
         }
 
@@ -153,7 +161,7 @@ namespace WebApplication4.Controllers
             };
 
             await _musicService.AddSongAsync(songDto);
-            TempData["SuccessMessage"] = "Песня успешно загружена администратором!";
+            await SendMessage("Добавлена новая музыка: " + model.Title);
             return RedirectToAction("UploadAdmin");
         }
 
@@ -187,7 +195,7 @@ namespace WebApplication4.Controllers
                 {
                     System.IO.File.Delete(filePath);
                 }
-
+                await SendMessage("Песня: " + song.Title + " удалена");
                 await _musicService.DeleteSongAsync(id);
                 TempData["SuccessMessage"] = "Песня успешно удалена!";
             }
@@ -196,7 +204,7 @@ namespace WebApplication4.Controllers
                 TempData["ErrorMessage"] = "Ошибка при удалении песни.";
                 Console.WriteLine($"Ошибка удаления песни: {ex.Message}");
             }
-
+            await SendMessage("Удалена одна песня: ");
             return RedirectToAction("Index");
         }
 
@@ -213,7 +221,7 @@ namespace WebApplication4.Controllers
                 GenreId = song.GenreId,
                 Genres = await _musicService.GetAllGenresAsync()
             };
-
+          
             return View(viewModel);
         }
 
@@ -253,7 +261,7 @@ namespace WebApplication4.Controllers
             song.GenreId = model.GenreId ?? 0;
 
             await _musicService.UpdateSongAsync(song);
-            TempData["SuccessMessage"] = "Песня успешно обновлена!";
+            await SendMessage("Песня: " + model.Title + " отредактирована");
             return RedirectToAction("Index");
         }
     }

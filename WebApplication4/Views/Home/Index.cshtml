@@ -33,6 +33,7 @@
         }
     </div>
 </div>
+<div id="notification" class="alert" style="display:none; font-size:15px;"></div>
 <form asp-controller="Localization" asp-action="ChangeCulture" method="post">
     <select name="lang" onchange="this.form.submit()" class="form-select">
         <option value="ru" selected="@((Context.Request.Cookies["lang"] ?? "ru") == "ru")">Русский</option>
@@ -94,3 +95,27 @@
     }
 
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script type="text/javascript">
+    $(function () {
+        const hubConnection = new signalR.HubConnectionBuilder()
+            .withUrl("/notification")
+            .build();
+
+        hubConnection.on("displayMessage", function (message) {
+            $('#notification')
+                .html(message)
+                .show()
+                .addClass('alert-info')
+                .delay(5000)
+                .fadeOut();
+        });
+
+        hubConnection.start()
+            .then()
+            .catch(function (err) {
+                console.error(err.toString());
+            });
+    });
+</script>
